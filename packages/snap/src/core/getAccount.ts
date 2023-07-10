@@ -1,6 +1,5 @@
-import { Buffer } from 'buffer';
 import { JsonBIP44Node } from '@metamask/key-tree';
-import { KeyPair } from 'near-api-js';
+import { KeyPair } from '@near-js/crypto/lib/key_pair';
 import nacl from 'tweetnacl';
 import bs58 from 'bs58';
 
@@ -12,7 +11,6 @@ const nearNetwork = {
   testnet: 1,
 };
 
-// eslint-disable-next-line jsdoc/require-jsdoc
 export async function getKeyPair(
   snap: SnapsGlobalObject,
   network: NearNetwork,
@@ -34,4 +32,20 @@ export async function getKeyPair(
 
   const { secretKey } = nacl.sign.keyPair.fromSeed(seed);
   return KeyPair.fromString(bs58.encode(secretKey));
+}
+
+export async function getAccount(
+  snap: SnapsGlobalObject,
+  network: NearNetwork,
+): Promise<{
+  accountId: string;
+  publicKey: string;
+}> {
+  const keyPair = await getKeyPair(snap, network);
+  const accountId = Buffer.from(keyPair.getPublicKey().data).toString('hex');
+  const publicKey = keyPair.getPublicKey().toString();
+  return {
+    accountId,
+    publicKey,
+  };
 }

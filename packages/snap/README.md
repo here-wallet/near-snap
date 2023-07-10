@@ -1,18 +1,55 @@
-# TypeScript Example Snap
+# NEAR Protocol Snap
 
-This snap demonstrates how to develop a snap with TypeScript. It is a simple
-snap that displays a confirmation dialog when the `hello` JSON-RPC method is
-called.
+View and sign transactions for NEAR Protocol blockhain network
 
-## Testing
+## Get NEAR Account
 
-The snap comes with some basic tests, to demonstrate how to write tests for
-snaps. To test the snap, run `yarn test` in this directory. This will use
-[`@metamask/snaps-jest`](https://github.com/MetaMask/snaps/tree/main/packages/snaps-jest)
-to run the tests in `src/index.test.ts`.
+```js
+await window.ethereum.request({
+  method: 'wallet_invokeSnap',
+  params: {
+    snapId: defaultSnapOrigin,
+    request: {
+      method: 'near_getAccount',
+      params: { network: 'mainnet' } // testnet
+    },
+  },
+});
 
-## Notes
+// Result
+{ accountId: "e270b...c4dc6a", publicKey: "ed25519:GEvqvr..." }
+```
 
-- Babel is used for transpiling TypeScript to JavaScript, so when building with
-  the CLI, `transpilationMode` must be set to `localOnly` (default) or
-  `localAndDeps`.
+## Sign transactions
+
+```js
+// Like wallet-selector format transactions
+const transactions = [{
+  nonce: 1000,
+  recentBlockHash: 'block_hash',
+  receiverId: 'herewallet.near',
+  actions: [{
+    type: 'FunctionCall',
+    params: {
+      methodName: 'method',
+      args: { arg1: '123' },
+      gas: 500000000,
+      deposit: '3000000',
+    },
+  }]
+}]
+
+await window.ethereum.request({
+  method: 'wallet_invokeSnap',
+  params: {
+    snapId: defaultSnapOrigin,
+    request: {
+      method: 'near_signTransactions',
+      params: { network: 'mainnet', transactions }
+    }
+  }
+})
+
+// Result, null if transaction was dined
+[["txHash", "signedTrx_hex"], null, ["txHash", "signedTrx_hex"]]
+```

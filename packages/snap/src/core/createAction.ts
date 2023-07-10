@@ -1,19 +1,20 @@
 import { BN } from 'bn.js';
-import { utils, transactions } from 'near-api-js';
-import type { Action } from '@near-wallet-selector/core';
+import { PublicKey } from '@near-js/crypto/lib/public_key';
+import * as transactions from 'near-api-js/lib/transaction';
+import type { Action, AddKeyPermission } from '@near-wallet-selector/core';
 
-// const getAccessKey = (permission: AddKeyPermission) => {
-//   if (permission === "FullAccess") {
-//     return transactions.fullAccessKey();
-//   }
+const getAccessKey = (permission: AddKeyPermission) => {
+  if (permission === 'FullAccess') {
+    return transactions.fullAccessKey();
+  }
 
-//   const { receiverId, methodNames = [] } = permission;
-//   const allowance = permission.allowance
-//     ? new BN(permission.allowance)
-//     : undefined;
+  const { receiverId, methodNames = [] } = permission;
+  const allowance = permission.allowance
+    ? new BN(permission.allowance)
+    : undefined;
 
-//   return transactions.functionCallAccessKey(receiverId, methodNames, allowance);
-// };
+  return transactions.functionCallAccessKey(receiverId, methodNames, allowance);
+};
 
 export const createAction = (action: Action): transactions.Action => {
   switch (action.type) {
@@ -43,22 +44,20 @@ export const createAction = (action: Action): transactions.Action => {
 
     case 'Stake': {
       const { stake, publicKey } = action.params;
-      return transactions.stake(new BN(stake), utils.PublicKey.from(publicKey));
+      return transactions.stake(new BN(stake), PublicKey.from(publicKey));
     }
 
-    // case "AddKey": {
-    //   const { publicKey, accessKey } = action.params;
-
-    //   return transactions.addKey(
-    //     utils.PublicKey.from(publicKey),
-    //     // TODO: Use accessKey.nonce? near-api-js seems to think 0 is fine?
-    //     getAccessKey(accessKey.permission)
-    //   );
-    // }
+    case 'AddKey': {
+      const { publicKey, accessKey } = action.params;
+      return transactions.addKey(
+        PublicKey.from(publicKey),
+        getAccessKey(accessKey.permission),
+      );
+    }
 
     case 'DeleteKey': {
       const { publicKey } = action.params;
-      return transactions.deleteKey(utils.PublicKey.from(publicKey));
+      return transactions.deleteKey(PublicKey.from(publicKey));
     }
 
     case 'DeleteAccount': {

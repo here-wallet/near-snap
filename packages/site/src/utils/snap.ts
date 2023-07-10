@@ -50,14 +50,68 @@ export const getSnap = async (version?: string): Promise<Snap | undefined> => {
   }
 };
 
-/**
- * Invoke the "hello" method from the example snap.
- */
-
-export const sendHello = async () => {
+export const viewAccount = async () => {
   await window.ethereum.request({
     method: 'wallet_invokeSnap',
-    params: { snapId: defaultSnapOrigin, request: { method: 'hello' } },
+    params: {
+      snapId: defaultSnapOrigin,
+      request: { method: 'near_getAccount', params: { network: 'mainnet' } },
+    },
+  });
+};
+
+export const signTransaction = async () => {
+  await window.ethereum.request({
+    method: 'wallet_invokeSnap',
+    params: {
+      snapId: defaultSnapOrigin,
+      request: {
+        method: 'near_signTransactions',
+        params: {
+          network: 'mainnet',
+          transactions: [
+            {
+              nonce: 1000,
+              recentBlockHash: 'sjfksdfjjksdjf',
+              receiverId: 'herewallet.near',
+              actions: [
+                {
+                  type: 'FunctionCall',
+                  params: {
+                    methodName: 'method',
+                    args: { arg1: '123' },
+                    gas: 500000000,
+                    deposit: '3000000',
+                  },
+                },
+                {
+                  type: 'Transfer',
+                  params: {
+                    deposit: '1000000000000000',
+                  },
+                },
+              ],
+            },
+            {
+              nonce: 1000,
+              recentBlockHash: 'sjfksdfjjksdjf',
+              receiverId: 'herewallet.near',
+              actions: [
+                {
+                  type: 'FunctionCall',
+                  params: {
+                    methodName: 'method',
+                    args: { arg1: '123' },
+                    gas: 500000000,
+                    deposit: '3000000000000000000000000',
+                  },
+                },
+              ],
+            },
+          ],
+        },
+      },
+    },
   });
 };
 

@@ -1,10 +1,10 @@
 import { useContext } from 'react';
-import styled from 'styled-components';
 import { MetamaskActions, MetaMaskContext } from '../hooks';
 import {
   connectSnap,
   getSnap,
-  sendHello,
+  viewAccount,
+  signTransaction,
   shouldDisplayReconnectButton,
 } from '../utils';
 import {
@@ -14,90 +14,14 @@ import {
   SendHelloButton,
   Card,
 } from '../components';
-
-const Container = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  flex: 1;
-  margin-top: 7.6rem;
-  margin-bottom: 7.6rem;
-  ${({ theme }) => theme.mediaQueries.small} {
-    padding-left: 2.4rem;
-    padding-right: 2.4rem;
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-    width: auto;
-  }
-`;
-
-const Heading = styled.h1`
-  margin-top: 0;
-  margin-bottom: 2.4rem;
-  text-align: center;
-`;
-
-const Span = styled.span`
-  color: ${(props) => props.theme.colors.primary.default};
-`;
-
-const Subtitle = styled.p`
-  font-size: ${({ theme }) => theme.fontSizes.large};
-  font-weight: 500;
-  margin-top: 0;
-  margin-bottom: 0;
-  ${({ theme }) => theme.mediaQueries.small} {
-    font-size: ${({ theme }) => theme.fontSizes.text};
-  }
-`;
-
-const CardContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  max-width: 64.8rem;
-  width: 100%;
-  height: 100%;
-  margin-top: 1.5rem;
-`;
-
-const Notice = styled.div`
-  background-color: ${({ theme }) => theme.colors.background.alternative};
-  border: 1px solid ${({ theme }) => theme.colors.border.default};
-  color: ${({ theme }) => theme.colors.text.alternative};
-  border-radius: ${({ theme }) => theme.radii.default};
-  padding: 2.4rem;
-  margin-top: 2.4rem;
-  max-width: 60rem;
-  width: 100%;
-
-  & > * {
-    margin: 0;
-  }
-  ${({ theme }) => theme.mediaQueries.small} {
-    margin-top: 1.2rem;
-    padding: 1.6rem;
-  }
-`;
-
-const ErrorMessage = styled.div`
-  background-color: ${({ theme }) => theme.colors.error.muted};
-  border: 1px solid ${({ theme }) => theme.colors.error.default};
-  color: ${({ theme }) => theme.colors.error.alternative};
-  border-radius: ${({ theme }) => theme.radii.default};
-  padding: 2.4rem;
-  margin-bottom: 2.4rem;
-  margin-top: 2.4rem;
-  max-width: 60rem;
-  width: 100%;
-  ${({ theme }) => theme.mediaQueries.small} {
-    padding: 1.6rem;
-    margin-bottom: 1.2rem;
-    margin-top: 1.2rem;
-    max-width: 100%;
-  }
-`;
+import {
+  Container,
+  Heading,
+  Subtitle,
+  CardContainer,
+  ErrorMessage,
+  Span,
+} from './styled';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);
@@ -117,9 +41,18 @@ const Index = () => {
     }
   };
 
-  const handleSendHelloClick = async () => {
+  const handleViewAccountClick = async () => {
     try {
-      await sendHello();
+      await viewAccount();
+    } catch (e) {
+      console.error(e);
+      dispatch({ type: MetamaskActions.SetError, payload: e });
+    }
+  };
+
+  const handleSignTransactionClick = async () => {
+    try {
+      await signTransaction();
     } catch (e) {
       console.error(e);
       dispatch({ type: MetamaskActions.SetError, payload: e });
@@ -129,11 +62,9 @@ const Index = () => {
   return (
     <Container>
       <Heading>
-        Welcome to <Span>template-snap</Span>
+        Welcome to <Span>near-snap</Span>
       </Heading>
-      <Subtitle>
-        Get started by editing <code>src/index.ts</code>
-      </Subtitle>
+      <Subtitle>Interact with NEAR Protocol in your Metamask easy</Subtitle>
       <CardContainer>
         {state.error && (
           <ErrorMessage>
@@ -185,12 +116,12 @@ const Index = () => {
         )}
         <Card
           content={{
-            title: 'Send Hello message',
+            title: 'Get account',
             description:
-              'Display a custom message within a confirmation screen in MetaMask.',
+              'Display a NEAR Protocol address within a confirmation screen in MetaMask.',
             button: (
               <SendHelloButton
-                onClick={handleSendHelloClick}
+                onClick={handleViewAccountClick}
                 disabled={!state.installedSnap}
               />
             ),
@@ -202,14 +133,25 @@ const Index = () => {
             !shouldDisplayReconnectButton(state.installedSnap)
           }
         />
-        <Notice>
-          <p>
-            Please note that the <b>snap.manifest.json</b> and{' '}
-            <b>package.json</b> must be located in the server root directory and
-            the bundle must be hosted at the location specified by the location
-            field.
-          </p>
-        </Notice>
+        <Card
+          content={{
+            title: 'Sign transaction',
+            description:
+              'Sign a NEAR Protocol transaction within a confirmation screen in MetaMask.',
+            button: (
+              <SendHelloButton
+                onClick={handleSignTransactionClick}
+                disabled={!state.installedSnap}
+              />
+            ),
+          }}
+          disabled={!state.installedSnap}
+          fullWidth={
+            state.isFlask &&
+            Boolean(state.installedSnap) &&
+            !shouldDisplayReconnectButton(state.installedSnap)
+          }
+        />
       </CardContainer>
     </Container>
   );

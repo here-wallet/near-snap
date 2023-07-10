@@ -3,7 +3,9 @@ const through = require('through2');
 module.exports = {
   cliOptions: {
     src: './src/index.ts',
-    port: 8080,
+    dist: './dist',
+    outfileName: 'bundle.js',
+    port: 3000,
   },
   bundlerCustomizer: (bundler) => {
     bundler.transform(function () {

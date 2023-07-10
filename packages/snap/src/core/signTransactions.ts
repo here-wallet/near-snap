@@ -1,21 +1,19 @@
-import { Buffer } from 'buffer';
-import { transactions, InMemorySigner, utils } from 'near-api-js';
 import { InMemoryKeyStore } from 'near-api-js/lib/key_stores';
+import { InMemorySigner } from 'near-api-js/lib/signer';
+import * as transactions from 'near-api-js/lib/transaction';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
+import base58 from 'bs58';
 
-import { getKeyPair } from '../near/account';
 import { SignTransactionsParams } from '../interfaces';
-import { createAction } from '../utils/createAction';
-import { showConfirmationDialog } from '../utils/confirmation';
-import { messageCreator } from '../utils/messageCreator';
-import { getAccount } from './getAccount';
+import { createAction } from './createAction';
+import { viewTransactions } from './viewTransactions';
+import { getAccount, getKeyPair } from './getAccount';
 
-// eslint-disable-next-line jsdoc/require-jsdoc
 export async function signTransactions(
   snap: SnapsGlobalObject,
   params: SignTransactionsParams,
-): Promise<[string, string][]> {
-  const signedTransactions: [string, string][] = [];
+): Promise<([string, string] | null)[]> {
+  const signedTransactions: ([string, string] | null)[] = [];
   const { transactions: transactionsArray, network } = params;
 
   const keyPair = await getKeyPair(snap, network);
@@ -24,27 +22,32 @@ export async function signTransactions(
   await keystore.setKey(network, accountId, keyPair);
   const signer = new InMemorySigner(keystore);
 
-  const confirmation = await showConfirmationDialog(snap, {
-    description: `It will be signed with address: ${accountId}`,
-    prompt: `Do you want to sign this message${
-      transactionsArray.length > 1 ? 's' : ''
-    }?`,
-    textAreaContent: messageCreator(transactionsArray),
-  });
-
-  if (!confirmation) {
-    throw Error('Transaction not confirmed');
-  }
+  const dialogs = viewTransactions(transactionsArray, accountId);
+  let index = 0;
 
   for (const transactionData of transactionsArray) {
     try {
+      const confirmation = await snap.request({
+        method: 'snap_dialog',
+        params: {
+          type: 'confirmation',
+          content: dialogs[index],
+        },
+      });
+
+      index += 1;
+      if (!confirmation) {
+        signedTransactions.push(null);
+        continue;
+      }
+
       const transaction = transactions.createTransaction(
         accountId,
         keyPair.getPublicKey(),
         transactionData.receiverId,
         transactionData.nonce,
         transactionData.actions.map(createAction),
-        utils.serialize.base_decode(transactionData.recentBlockHash),
+        base58.decode(transactionData.recentBlockHash),
       );
 
       const signedTransaction = await transactions.signTransaction(
