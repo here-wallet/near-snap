@@ -10,6 +10,7 @@ import { NearSnap, NearSnapAccount, NearSnapStatus } from '@near-snap/sdk';
 export type MetamaskState = {
   installSnap: () => void;
   connectWallet: () => void;
+  disconnectWallet: () => void;
   setError: (_: Error) => void;
   status: NearSnapStatus | null;
   account: NearSnapAccount | null;
@@ -18,12 +19,13 @@ export type MetamaskState = {
 };
 
 export const snap = new NearSnap({
-  id: process.env.SNAP_ORIGIN ?? 'local:http://localhost:3000',
+  id: process.env.GATSBY_SNAP_ORIGIN ?? 'npm:@near-snap/plugin',
 });
 
 export const MetaMaskContext = createContext<MetamaskState>({
   installSnap: () => {},
   connectWallet: () => {},
+  disconnectWallet: () => {},
   setError: (_: Error) => {},
   status: null,
   account: null,
@@ -31,18 +33,7 @@ export const MetaMaskContext = createContext<MetamaskState>({
   snap,
 });
 
-/**
- * MetaMask context provider to handle MetaMask and snap status.
- *
- * @param props - React Props.
- * @param props.children - React component to be wrapped by the Provider.
- * @returns JSX.
- */
 export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
-  if (typeof window === 'undefined') {
-    return <>{children}</>;
-  }
-
   const [status, setStatus] = useState<NearSnapStatus | null>(null);
   const [account, setAccount] = useState<NearSnapAccount | null>(null);
   const [error, setError] = useState<Error | null>(null);
@@ -54,10 +45,10 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let timeoutId: number;
     if (error) {
-      timeoutId = window.setTimeout(() => setError(null), 10000);
+      timeoutId = window?.setTimeout(() => setError(null), 10000);
     }
 
-    return () => window.clearTimeout(timeoutId);
+    return () => window?.clearTimeout(timeoutId);
   }, [error]);
 
   const installSnap = useCallback(async () => {
@@ -78,10 +69,13 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
+  const disconnectWallet = useCallback(() => setAccount(null), []);
+
   return (
     <MetaMaskContext.Provider
       value={{
         installSnap,
+        disconnectWallet,
         connectWallet,
         setError,
         status,

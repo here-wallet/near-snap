@@ -1,8 +1,7 @@
 {
   "name": "@near-snap/plugin",
-  "version": "0.1.0",
-  "private": true,
-  "description": "The 'Hello, world!' of MetaMask Snaps, now written in TypeScript.",
+  "version": "0.1.1",
+  "description": "View and sign transactions for NEAR Protocol",
   "repository": {
     "type": "git",
     "url": "https://github.com/here-wallet/near-snap.git"
@@ -18,7 +17,7 @@
     "build": "mm-snap build",
     "build:clean": "yarn clean && yarn build",
     "clean": "rimraf dist",
-    "lint": "yarn lint:eslint && yarn lint:misc --check",
+    "lint": "yarn lint:eslint && yarwn lint:misc --check",
     "lint:eslint": "eslint . --cache --ext js,ts",
     "lint:fix": "yarn lint:eslint --fix && yarn lint:misc --write",
     "lint:misc": "prettier '**/*.json' '**/*.md' '!CHANGELOG.md' --ignore-path .gitignore",

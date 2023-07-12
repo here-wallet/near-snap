@@ -98,22 +98,22 @@ export const Button = (
 export const HeaderButtons = () => {
   const { status, snap, installSnap } = useContext(MetaMaskContext);
 
-  if (status === NearSnapStatus.NOT_SUPPORTED) {
+  if (status === null || status === NearSnapStatus.NOT_SUPPORTED) {
     return <InstallFlaskButton />;
   }
 
   if (status === NearSnapStatus.NOT_INSTALLED) {
-    return <MetamaskButton onClick={installSnap}>Connect</MetamaskButton>;
+    return <MetamaskButton onClick={installSnap}>Install</MetamaskButton>;
   }
 
   if (status === NearSnapStatus.INSTALLED && snap.isLocal) {
-    return <MetamaskButton onClick={installSnap}>Reconnect</MetamaskButton>;
+    return <MetamaskButton onClick={installSnap}>Reinstall</MetamaskButton>;
   }
 
   return (
     <ConnectedContainer>
       <ConnectedIndicator />
-      <ButtonText>Connected</ButtonText>
+      <ButtonText>Installed</ButtonText>
     </ConnectedContainer>
   );
 };

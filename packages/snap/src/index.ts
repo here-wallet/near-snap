@@ -20,7 +20,7 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       assert(request.params, validAccountSchema);
 
       const account = await getAccount(snap, request.params.network);
-      await snap.request({
+      const isConfirmed = await snap.request({
         method: 'snap_dialog',
         params: {
           type: 'confirmation',
@@ -36,6 +36,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
           ]),
         },
       });
+
+      if (!isConfirmed) {
+        throw Error('Access is denied');
+      }
 
       return account;
     }

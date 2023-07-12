@@ -1,10 +1,11 @@
 import { useContext } from 'react';
 import styled, { useTheme } from 'styled-components';
+
+import { ToggleThemeContext } from '../Root';
 import { getThemePreference } from '../theme';
 import { HeaderButtons } from './Buttons';
 import { SnapLogo } from './SnapLogo';
 import { Toggle } from './Toggle';
-import { ToggleThemeContext } from '../Root';
 
 const HeaderWrapper = styled.header`
   display: flex;

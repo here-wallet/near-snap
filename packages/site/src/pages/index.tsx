@@ -18,8 +18,9 @@ import {
 } from '../components';
 
 const Index = () => {
-  const { installSnap, connectWallet, setError, error, status, snap, account } =
-    useContext(MetaMaskContext);
+  const context = useContext(MetaMaskContext);
+  const { installSnap, connectWallet, disconnectWallet, setError } = context;
+  const { error, status, snap, account } = context;
 
   const handleSignTransactionClick = async () => {
     try {
@@ -46,6 +47,24 @@ const Index = () => {
     }
   };
 
+  if (status === null) {
+    return (
+      <Container>
+        <Heading>
+          Welcome to <Span>near-snap</Span>
+        </Heading>
+        <Subtitle>Interact with NEAR Protocol in your Metamask easy</Subtitle>
+        <CardContainer>
+          {error && (
+            <ErrorMessage>
+              <b>An error happened:</b> {error.message}
+            </ErrorMessage>
+          )}
+        </CardContainer>
+      </Container>
+    );
+  }
+
   return (
     <Container>
       <Heading>
@@ -58,6 +77,7 @@ const Index = () => {
             <b>An error happened:</b> {error.message}
           </ErrorMessage>
         )}
+
         {status === NearSnapStatus.NOT_SUPPORTED && (
           <Card
             content={{
@@ -66,18 +86,19 @@ const Index = () => {
                 'Snaps is pre-release software only available in MetaMask Flask, a canary distribution for developers with access to upcoming features.',
               button: <InstallFlaskButton />,
             }}
-            fullWidth
           />
         )}
 
         {status === NearSnapStatus.NOT_INSTALLED && (
           <Card
             content={{
-              title: 'Connect',
+              title: 'Install Snap',
               description:
                 'Get started by connecting to and installing the Near Snap.',
               button: (
-                <MetamaskButton onClick={installSnap}>Connect</MetamaskButton>
+                <MetamaskButton onClick={installSnap}>
+                  Install Snap
+                </MetamaskButton>
               ),
             }}
           />
@@ -86,26 +107,37 @@ const Index = () => {
         {status === NearSnapStatus.INSTALLED && snap.isLocal && (
           <Card
             content={{
-              title: 'Reconnect',
+              title: 'Reinstall',
               description:
                 'While connected to a local running snap this button will always be displayed in order to update the snap if a change is made.',
               button: (
-                <MetamaskButton onClick={installSnap}>Reconnect</MetamaskButton>
+                <MetamaskButton onClick={installSnap}>Reinstall</MetamaskButton>
               ),
             }}
           />
         )}
 
-        <Card
-          disabled={status !== NearSnapStatus.INSTALLED}
-          fullWidth={status === NearSnapStatus.INSTALLED && !snap.isLocal}
-          content={{
-            title: 'Connect wallet',
-            description:
-              'Display a NEAR Protocol address within a confirmation screen in MetaMask.',
-            button: <Button onClick={connectWallet}>Connect</Button>,
-          }}
-        />
+        {account === null && (
+          <Card
+            disabled={status !== NearSnapStatus.INSTALLED}
+            content={{
+              title: 'Connect wallet',
+              description:
+                'Display a NEAR Protocol address within a confirmation screen in MetaMask.',
+              button: <Button onClick={connectWallet}>Connect</Button>,
+            }}
+          />
+        )}
+
+        {account !== null && (
+          <Card
+            content={{
+              title: 'Hello',
+              description: account.target.accountId,
+              button: <Button onClick={disconnectWallet}>Disconnect</Button>,
+            }}
+          />
+        )}
 
         <Card
           disabled={!account}
