@@ -4,6 +4,7 @@ import { getThemePreference } from '../theme';
 import { HeaderButtons } from './Buttons';
 import { SnapLogo } from './SnapLogo';
 import { Toggle } from './Toggle';
+import { ToggleThemeContext } from '../Root';
 
 const HeaderWrapper = styled.header`
   display: flex;
@@ -36,28 +37,10 @@ const RightContainer = styled.div`
   align-items: center;
 `;
 
-export const Header = ({
-  handleToggleClick,
-}: {
-  handleToggleClick(): void;
-}) => {
+export const Header = () => {
   const theme = useTheme();
-  const [state, dispatch] = useContext(MetaMaskContext);
+  const toggleTheme = useContext(ToggleThemeContext);
 
-  const handleConnectClick = async () => {
-    try {
-      await connectSnap();
-      const installedSnap = await getSnap();
-
-      dispatch({
-        type: MetamaskActions.SetInstalled,
-        payload: installedSnap,
-      });
-    } catch (e) {
-      console.error(e);
-      dispatch({ type: MetamaskActions.SetError, payload: e });
-    }
-  };
   return (
     <HeaderWrapper>
       <LogoWrapper>
@@ -65,11 +48,8 @@ export const Header = ({
         <Title>near-snap</Title>
       </LogoWrapper>
       <RightContainer>
-        <Toggle
-          onToggle={handleToggleClick}
-          defaultChecked={getThemePreference()}
-        />
-        <HeaderButtons state={state} onConnectClick={handleConnectClick} />
+        <Toggle onToggle={toggleTheme} defaultChecked={getThemePreference()} />
+        <HeaderButtons />
       </RightContainer>
     </HeaderWrapper>
   );

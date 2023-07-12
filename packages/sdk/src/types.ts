@@ -1,7 +1,15 @@
 import { Action, NetworkId } from '@near-wallet-selector/core';
 import { PublicKey } from 'near-api-js/lib/utils';
 
+export declare type Maybe<T> = Partial<T> | null | undefined;
+
 export type GetSnapsResponse = Record<string, Snap>;
+
+export enum NearSnapStatus {
+  NOT_SUPPORTED,
+  NOT_INSTALLED,
+  INSTALLED,
+}
 
 export type Snap = {
   permissionName: string;

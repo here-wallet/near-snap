@@ -7,9 +7,9 @@ import {
 import { SignedTransaction } from 'near-api-js/lib/transaction';
 import { PublicKey } from 'near-api-js/lib/utils';
 
-import { NearSnap } from './snap';
-import { AccountTarget } from './types';
 import { TransactionInListError, TransactionSignRejected } from './errors';
+import { AccountTarget, NearSnapStatus } from './types';
+import NearSnap from './snap';
 
 const nearProviders: Record<NetworkId, string> = {
   mainnet: 'https://rpc.mainnet.near.org',
@@ -38,14 +38,17 @@ class NearSnapAccount {
   async signAndSendTransactions(
     transactions: Omit<Transaction, 'signerId'>[],
   ): Promise<FinalExecutionOutcome[]> {
-    const access = await this.provider.query<
-      { nonce: number } & QueryResponseKind
-    >({
-      request_type: 'view_access_key',
-      finality: 'final',
-      account_id: this.target.accountId,
-      public_key: this.target.publicKey.toString(),
-    });
+    const access = await this.provider
+      .query<{ nonce: number } & QueryResponseKind>({
+        request_type: 'view_access_key',
+        finality: 'final',
+        account_id: this.target.accountId,
+        public_key: this.target.publicKey.toString(),
+      })
+      .catch(async () => {
+        const block = await this.provider.block({ finality: 'final' });
+        return { nonce: 1, block_hash: block.header.hash };
+      });
 
     const signedList = await this.snap.signTransactions({
       network: this.target.network,
@@ -61,7 +64,7 @@ class NearSnapAccount {
     }
 
     const result: FinalExecutionOutcome[] = [];
-    signedList?.forEach((t, i) => {
+    signedList?.forEach((t: unknown, i: number) => {
       if (t === null || t === undefined) {
         throw new TransactionSignRejected(transactions[i]);
       }
@@ -81,7 +84,12 @@ class NearSnapAccount {
   }
 
   static async connect(network: NetworkId, snap: NearSnap) {
-    if (!(await snap.isConnected())) {
+    const status = await snap.getStatus();
+    if (status === NearSnapStatus.NOT_SUPPORTED) {
+      throw Error('You need install Metamask Flask');
+    }
+
+    if (status === NearSnapStatus.NOT_INSTALLED) {
       await snap.install();
     }
 

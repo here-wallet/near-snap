@@ -1,6 +1,9 @@
 import { createContext, FunctionComponent, ReactNode, useState } from 'react';
 import { ThemeProvider } from 'styled-components';
 
+// eslint-disable-next-line import/no-unassigned-import
+import './buffer';
+
 import { getThemePreference } from './theme';
 import { setLocalStorage } from './theme/utils';
 import { dark, light } from './theme/config';

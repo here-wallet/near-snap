@@ -6,6 +6,7 @@ module.exports = {
       files: ['**/*.{ts,tsx}'],
       rules: {
         'jsdoc/require-jsdoc': 0,
+        '@typescript-eslint/no-empty-function': 0,
       },
     },
   ],

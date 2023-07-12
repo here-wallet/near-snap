@@ -1,42 +1,32 @@
 import {
   createContext,
-  Dispatch,
   ReactNode,
-  useContext,
+  useCallback,
   useEffect,
-  useReducer,
+  useState,
 } from 'react';
+import { NearSnap, NearSnapAccount, NearSnapStatus } from '@near-snap/sdk';
 
-const noop = () => {
-  /* */
-};
-
-const initialState: MetamaskState = {
-  isFlask: false,
-  error: undefined,
-};
-
-type MetamaskDispatch = { type: MetamaskActions; payload: any };
 export type MetamaskState = {
-  isFlask: boolean;
-  installedSnap?: Snap;
-  error?: Error;
+  installSnap: () => void;
+  connectWallet: () => void;
+  setError: (_: Error) => void;
+  status: NearSnapStatus | null;
+  account: NearSnapAccount | null;
+  error: Error | null;
+  snap: NearSnap;
 };
 
-export const MetaMaskContext = createContext<
-  [MetamaskState, Dispatch<MetamaskDispatch>]
->([initialState, noop]);
-
-export enum MetamaskActions {
-  SetInstalled = 'SetInstalled',
-  SetFlaskDetected = 'SetFlaskDetected',
-  SetError = 'SetError',
-}
-
-export const useShouldDisplayReconnectButton = () => {
-  const [state] = useContext(MetaMaskContext);
-  return state.installedSnap && state.installedSnap.id.startWith('local:');
-};
+export const snap = new NearSnap();
+export const MetaMaskContext = createContext<MetamaskState>({
+  installSnap: () => {},
+  connectWallet: () => {},
+  setError: (_: Error) => {},
+  status: null,
+  account: null,
+  error: null,
+  snap,
+});
 
 /**
  * MetaMask context provider to handle MetaMask and snap status.
@@ -50,66 +40,53 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
     return <>{children}</>;
   }
 
-  const [state, dispatch] = useReducer(
-    (prevState: MetamaskState, action: MetamaskDispatch) => {
-      switch (action.type) {
-        case MetamaskActions.SetInstalled:
-          return { ...prevState, installedSnap: action.payload };
-
-        case MetamaskActions.SetFlaskDetected:
-          return { ...prevState, isFlask: action.payload };
-
-        case MetamaskActions.SetError:
-          return { ...prevState, error: action.payload };
-
-        default:
-          return prevState;
-      }
-    },
-    initialState,
-  );
+  const [status, setStatus] = useState<NearSnapStatus | null>(null);
+  const [account, setAccount] = useState<NearSnapAccount | null>(null);
+  const [error, setError] = useState<Error | null>(null);
 
   useEffect(() => {
-    async function detectFlask() {
-      const isFlaskDetected = await isFlask();
-      dispatch({
-        type: MetamaskActions.SetFlaskDetected,
-        payload: isFlaskDetected,
-      });
-    }
-
-    async function detectSnapInstalled() {
-      const installedSnap = await getSnap();
-      dispatch({
-        type: MetamaskActions.SetInstalled,
-        payload: installedSnap,
-      });
-    }
-
-    detectFlask();
-    if (state.isFlask) {
-      detectSnapInstalled();
-    }
-  }, [state.isFlask, window.ethereum]);
+    snap.getStatus().then(setStatus).catch(setError);
+  }, [snap]);
 
   useEffect(() => {
     let timeoutId: number;
-
-    if (state.error) {
-      timeoutId = window.setTimeout(() => {
-        dispatch({ type: MetamaskActions.SetError, payload: undefined });
-      }, 10000);
+    if (error) {
+      timeoutId = window.setTimeout(() => setError(null), 10000);
     }
 
-    return () => {
-      if (timeoutId) {
-        window.clearTimeout(timeoutId);
-      }
-    };
-  }, [state.error]);
+    return () => window.clearTimeout(timeoutId);
+  }, [error]);
+
+  const installSnap = useCallback(async () => {
+    try {
+      await snap.install();
+      setStatus(NearSnapStatus.INSTALLED);
+    } catch (e) {
+      setError(e);
+    }
+  }, []);
+
+  const connectWallet = useCallback(async () => {
+    try {
+      const snapAccount = await NearSnapAccount.connect('testnet', snap);
+      setAccount(snapAccount);
+    } catch (e) {
+      setError(e);
+    }
+  }, []);
 
   return (
-    <MetaMaskContext.Provider value={[state, dispatch]}>
+    <MetaMaskContext.Provider
+      value={{
+        installSnap,
+        connectWallet,
+        setError,
+        status,
+        account,
+        error,
+        snap,
+      }}
+    >
       {children}
     </MetaMaskContext.Provider>
   );

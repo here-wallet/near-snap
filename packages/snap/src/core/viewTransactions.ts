@@ -47,7 +47,7 @@ export const viewTransactions = (
 
         case 'DeleteKey': {
           view.children.push(
-            text('PublicKey:'),
+            text('Public key:'),
             copyable(action.params.publicKey),
           );
           continue;
@@ -57,7 +57,7 @@ export const viewTransactions = (
           if (action.params.accessKey.permission === 'FullAccess') {
             view.children.push(
               text('**WARNING! Allocate full access key**'),
-              text('publicKey:'),
+              text('Public key:'),
               copyable(action.params.publicKey),
             );
             continue;
@@ -66,17 +66,17 @@ export const viewTransactions = (
           const { allowance, receiverId, methodNames } =
             action.params.accessKey.permission;
 
-          view.children.push(text(`receiverId: ${receiverId}`));
+          view.children.push(text(`Receiver: ${receiverId}`));
           if (allowance !== undefined) {
-            view.children.push(text(`allowance: ${formatAmount(allowance)}`));
+            view.children.push(text(`Allowance: ${formatAmount(allowance)}`));
           }
 
           if (methodNames !== undefined) {
-            view.children.push(text(`methodNames: ${methodNames.join(', ')}`));
+            view.children.push(text(`Methods: ${methodNames.join(', ')}`));
           }
 
           view.children.push(
-            text('publicKey:'),
+            text('Public key:'),
             copyable(action.params.publicKey),
           );
 

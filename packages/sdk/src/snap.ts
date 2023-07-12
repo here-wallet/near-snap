@@ -1,8 +1,8 @@
 import { NetworkId } from '@near-wallet-selector/core';
-import { SignTransactionsParams } from './types';
+import { SignTransactionsParams, Maybe, NearSnapStatus } from './types';
 import NearSnapProvider from './provider';
 
-export class NearSnap {
+class NearSnap {
   readonly id: string;
 
   readonly provider: NearSnapProvider;
@@ -12,33 +12,41 @@ export class NearSnap {
     this.id = id;
   }
 
-  async isAvailable() {
-    return await this.provider.isSnapsAvailable();
+  get isLocal() {
+    return this.id.startsWith('local:');
   }
 
-  async isConnected() {
+  async getStatus() {
+    const isAvailable = await this.provider.isSnapsAvailable();
+    if (!isAvailable) {
+      return NearSnapStatus.NOT_SUPPORTED;
+    }
+
     const snap = await this.provider.getSnap(this.id);
-    return Boolean(snap);
+    return snap ? NearSnapStatus.INSTALLED : NearSnapStatus.NOT_INSTALLED;
   }
 
   async install() {
     await this.provider.connectSnap(this.id);
   }
 
-  async getAccount(network: NetworkId) {
-    return await this.provider.invokeSnap<{
-      accountId: string;
-      publicKey: string;
-    }>(this.id, 'near_getAccount', {
+  async getAccount(
+    network: NetworkId,
+  ): Promise<Maybe<{ accountId: string; publicKey: string }>> {
+    return await this.provider.invokeSnap(this.id, 'near_getAccount', {
       network,
     });
   }
 
-  async signTransactions(transactions: SignTransactionsParams) {
-    return await this.provider.invokeSnap<([string, string] | null)[]>(
+  async signTransactions(
+    transactions: SignTransactionsParams,
+  ): Promise<Maybe<([string, string] | null)[]>> {
+    return await this.provider.invokeSnap(
       this.id,
       'near_signTransactions',
       transactions,
     );
   }
 }
+
+export default NearSnap;

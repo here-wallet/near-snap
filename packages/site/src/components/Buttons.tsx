@@ -1,6 +1,9 @@
-import { ComponentProps } from 'react';
+import { ComponentProps, useContext } from 'react';
 import styled from 'styled-components';
+import { NearSnapStatus } from '@near-snap/sdk';
+
 import { ReactComponent as FlaskFox } from '../assets/flask_fox.svg';
+import { MetaMaskContext } from '../metamask';
 
 const Link = styled.a`
   display: flex;
@@ -30,11 +33,12 @@ const Link = styled.a`
   }
 `;
 
-const Button = styled.button`
+const SButton = styled.button`
   display: flex;
   align-self: flex-start;
   align-items: center;
   justify-content: center;
+  padding: 0 16px;
   margin-top: auto;
   ${({ theme }) => theme.mediaQueries.small} {
     width: 100%;
@@ -74,41 +78,36 @@ export const InstallFlaskButton = () => (
   </Link>
 );
 
-export const ConnectButton = (props: ComponentProps<typeof Button>) => {
+export const MetamaskButton = (
+  props: ComponentProps<typeof SButton> & { children: string },
+) => {
   return (
-    <Button {...props}>
+    <SButton {...props}>
       <FlaskFox />
-      <ButtonText>Connect</ButtonText>
-    </Button>
+      <ButtonText>{props.children}</ButtonText>
+    </SButton>
   );
 };
 
-export const ReconnectButton = (props: ComponentProps<typeof Button>) => {
-  return (
-    <Button {...props}>
-      <FlaskFox />
-      <ButtonText>Reconnect</ButtonText>
-    </Button>
-  );
+export const Button = (
+  props: ComponentProps<typeof SButton> & { children: string },
+) => {
+  return <SButton {...props}>{props.children}</SButton>;
 };
 
-export const HeaderButtons = ({
-  state,
-  onConnectClick,
-}: {
-  state: MetamaskState;
-  onConnectClick(): unknown;
-}) => {
-  if (!state.isFlask && !state.installedSnap) {
+export const HeaderButtons = () => {
+  const { status, snap, installSnap } = useContext(MetaMaskContext);
+
+  if (status === NearSnapStatus.NOT_SUPPORTED) {
     return <InstallFlaskButton />;
   }
 
-  if (!state.installedSnap) {
-    return <ConnectButton onClick={onConnectClick} />;
+  if (status === NearSnapStatus.NOT_INSTALLED) {
+    return <MetamaskButton onClick={installSnap}>Connect</MetamaskButton>;
   }
 
-  if (shouldDisplayReconnectButton(state.installedSnap)) {
-    return <ReconnectButton onClick={onConnectClick} />;
+  if (status === NearSnapStatus.INSTALLED && snap.isLocal) {
+    return <MetamaskButton onClick={installSnap}>Reconnect</MetamaskButton>;
   }
 
   return (

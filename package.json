@@ -1,5 +1,5 @@
 {
-  "name": "@metamask/template-snap-monorepo",
+  "name": "near-snap",
   "version": "0.1.0",
   "private": true,
   "description": "",
@@ -44,7 +44,7 @@
     "prettier-plugin-packagejson": "^2.2.18",
     "typescript": "^4.7.4"
   },
-  "packageManager": "yarn@3.2.1",
+  "packageManager": "yarn@3.6.1",
   "engines": {
     "node": ">=16.0.0"
   }

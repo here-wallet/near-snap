@@ -4,28 +4,42 @@
   "proposedName": "NEAR Protocol Snap",
   "repository": {
     "type": "git",
-    "url": "https://github.com/MetaMask/template-snap-monorepo.git"
+    "url": "https://github.com/here-wallet/near-snap.git"
   },
   "source": {
-    "shasum": "ivQrv09mQe6GixDRHng2k7wGtpLsQCOI82jngBjcMIs=",
+    "shasum": "Qk/3WaptMfJ+n+QoYYl2fkAtJYCVtptnk3MnMuDxshk=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
         "iconPath": "images/icon.svg",
-        "packageName": "snap",
+        "packageName": "@near-snap/plugin",
         "registry": "https://registry.npmjs.org/"
       }
     }
   },
   "initialPermissions": {
     "snap_dialog": {},
+    "endowment:rpc": {
+      "dapps": true,
+      "snaps": false
+    },
     "snap_getBip32Entropy": [
       {
-        "path": ["m", "44'", "397'", "0'"],
+        "path": [
+          "m",
+          "44'",
+          "397'",
+          "0'"
+        ],
         "curve": "ed25519"
       },
       {
-        "path": ["m", "44'", "1'", "0'"],
+        "path": [
+          "m",
+          "44'",
+          "1'",
+          "0'"
+        ],
         "curve": "ed25519"
       }
     ]

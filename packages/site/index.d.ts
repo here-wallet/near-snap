@@ -1,7 +1,6 @@
-/* eslint-disable import/no-unassigned-import */
 /* eslint-disable*/
+
 import { MetaMaskInpageProvider } from '@metamask/providers';
-import React from 'react';
 import 'styled-components';
 
 /**
@@ -18,12 +17,6 @@ declare module 'styled-components' {
     shadows: Record<string, string>;
     colors: Record<string, Record<string, string>>;
   }
-}
-
-declare module '*.svg' {
-  export const ReactComponent: React.FunctionComponent<
-    React.SVGAttributes<SVGElement>
-  >;
 }
 
 /*

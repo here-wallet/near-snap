@@ -1,8 +1,28 @@
 {
-  "name": "sdk",
-  "packageManager": "yarn@3.2.1",
+  "name": "@near-snap/sdk",
+  "version": "0.1.0",
+  "homepage": "https://github.com/here-wallet/near-snap#readme",
+  "bugs": {
+    "url": "https://github.com/here-wallet/near-snap/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/here-wallet/near-snap.git"
+  },
+  "exports": {
+    ".": "./build/index.js"
+  },
+  "main": "./build/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc --watch"
+  },
   "dependencies": {
     "@near-wallet-selector/core": "^8.2.0",
     "near-api-js": "^2.1.4"
-  }
+  },
+  "devDependencies": {
+    "typescript": "^5.1.6"
+  },
+  "packageManager": "yarn@3.2.1"
 }

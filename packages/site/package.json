@@ -1,7 +1,15 @@
 {
-  "name": "site",
+  "name": "@near-snap/site",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://github.com/here-wallet/near-snap#readme",
+  "bugs": {
+    "url": "https://github.com/here-wallet/near-snap/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/here-wallet/near-snap.git"
+  },
   "license": "(MIT-0 OR Apache-2.0)",
   "scripts": {
     "build": "cross-env GATSBY_TELEMETRY_DISABLED=1 gatsby build",
@@ -26,6 +34,12 @@
   },
   "dependencies": {
     "@metamask/providers": "^9.0.0",
+    "@near-js/crypto": "^0.0.5",
+    "@near-snap/sdk": "workspace:*",
+    "@near-wallet-selector/core": "^8.2.0",
+    "assert": "^2.0.0",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-is": "^18.2.0",
@@ -62,6 +76,7 @@
     "prettier": "^2.2.1",
     "prettier-plugin-packagejson": "^2.2.18",
     "rimraf": "^3.0.2",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "webpack": "^5.88.1"
   }
 }
