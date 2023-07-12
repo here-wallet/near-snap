@@ -1,0 +1,8 @@
+{
+  "name": "sdk",
+  "packageManager": "yarn@3.2.1",
+  "dependencies": {
+    "@near-wallet-selector/core": "^8.2.0",
+    "near-api-js": "^2.1.4"
+  }
+}

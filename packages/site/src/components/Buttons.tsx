@@ -1,8 +1,6 @@
 import { ComponentProps } from 'react';
 import styled from 'styled-components';
-import { MetamaskState } from '../hooks';
 import { ReactComponent as FlaskFox } from '../assets/flask_fox.svg';
-import { shouldDisplayReconnectButton } from '../utils';
 
 const Link = styled.a`
   display: flex;
@@ -92,10 +90,6 @@ export const ReconnectButton = (props: ComponentProps<typeof Button>) => {
       <ButtonText>Reconnect</ButtonText>
     </Button>
   );
-};
-
-export const SendHelloButton = (props: ComponentProps<typeof Button>) => {
-  return <Button {...props}>Send message</Button>;
 };
 
 export const HeaderButtons = ({

@@ -1,4 +1,4 @@
-import { getLocalStorage, setLocalStorage } from './localStorage';
+import { getLocalStorage, setLocalStorage } from './utils';
 
 /**
  * Get the user's preferred theme in local storage.

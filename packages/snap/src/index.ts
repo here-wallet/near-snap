@@ -15,8 +15,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   request,
   origin,
 }) => {
-  console.log(request);
-
   switch (request.method) {
     case Methods.GetAddress: {
       assert(request.params, validAccountSchema);
@@ -32,7 +30,6 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
 
             text('Your address:'),
             copyable(account.accountId),
-            // text('‎'),
 
             text('Your public key:'),
             copyable(account.publicKey),

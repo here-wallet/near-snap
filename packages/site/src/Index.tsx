@@ -1,27 +1,17 @@
 import { useContext } from 'react';
-import { MetamaskActions, MetaMaskContext } from '../hooks';
-import {
-  connectSnap,
-  getSnap,
-  viewAccount,
-  signTransaction,
-  shouldDisplayReconnectButton,
-} from '../utils';
+import { MetamaskActions, MetaMaskContext } from './metamask';
 import {
   ConnectButton,
   InstallFlaskButton,
   ReconnectButton,
-  SendHelloButton,
   Card,
-} from '../components';
-import {
   Container,
   Heading,
   Subtitle,
   CardContainer,
   ErrorMessage,
   Span,
-} from './styled';
+} from './components';
 
 const Index = () => {
   const [state, dispatch] = useContext(MetaMaskContext);

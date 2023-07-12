@@ -20058,6 +20058,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"sdk@workspace:packages/sdk":
+  version: 0.0.0-use.local
+  resolution: "sdk@workspace:packages/sdk"
+  dependencies:
+    "@near-wallet-selector/core": ^8.2.0
+    near-api-js: ^2.1.4
+  languageName: unknown
+  linkType: soft
+
 "secp256k1@npm:^4.0.1":
   version: 4.0.3
   resolution: "secp256k1@npm:4.0.3"

@@ -19,32 +19,16 @@
   },
   "initialPermissions": {
     "snap_dialog": {},
-    "snap_notify": {},
     "snap_getBip32Entropy": [
       {
-        "path": [
-          "m",
-          "44'",
-          "397'",
-          "0'"
-        ],
+        "path": ["m", "44'", "397'", "0'"],
         "curve": "ed25519"
       },
       {
-        "path": [
-          "m",
-          "44'",
-          "1'",
-          "0'"
-        ],
+        "path": ["m", "44'", "1'", "0'"],
         "curve": "ed25519"
       }
-    ],
-    "endowment:network-access": {},
-    "endowment:rpc": {
-      "dapps": true,
-      "snaps": false
-    }
+    ]
   },
   "manifestVersion": "0.1"
 }

@@ -2,7 +2,7 @@ import { FunctionComponent, ReactNode, useContext } from 'react';
 import styled from 'styled-components';
 import { Footer, Header } from './components';
 
-import { GlobalStyle } from './config/theme';
+import { GlobalStyle } from './theme/config';
 import { ToggleThemeContext } from './Root';
 
 const Wrapper = styled.div`
