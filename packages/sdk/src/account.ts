@@ -83,7 +83,7 @@ class NearSnapAccount {
     return result;
   }
 
-  static async connect(network: NetworkId, snap: NearSnap) {
+  static async connect(network: NetworkId, snap = new NearSnap()) {
     const status = await snap.getStatus();
     if (status === NearSnapStatus.NOT_SUPPORTED) {
       throw Error('You need install Metamask Flask');

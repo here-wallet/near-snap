@@ -17,7 +17,10 @@ export type MetamaskState = {
   snap: NearSnap;
 };
 
-export const snap = new NearSnap();
+export const snap = new NearSnap({
+  id: process.env.SNAP_ORIGIN ?? 'local:http://localhost:3000',
+});
+
 export const MetaMaskContext = createContext<MetamaskState>({
   installSnap: () => {},
   connectWallet: () => {},

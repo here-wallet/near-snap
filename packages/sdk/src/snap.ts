@@ -7,9 +7,9 @@ class NearSnap {
 
   readonly provider: NearSnapProvider;
 
-  constructor(id = 'local:http://localhost:3000', provider?: NearSnapProvider) {
-    this.provider = provider ?? new NearSnapProvider();
-    this.id = id;
+  constructor(options?: { id: string; provider?: NearSnapProvider }) {
+    this.provider = options?.provider ?? new NearSnapProvider();
+    this.id = options?.id ?? 'npm:@near-snap/plugin';
   }
 
   get isLocal() {
