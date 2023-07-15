@@ -1,6 +1,11 @@
-import { NetworkId } from '@near-wallet-selector/core';
-import { SignTransactionsParams, Maybe, NearSnapStatus } from './types';
+import type { NetworkId } from '@near-wallet-selector/core';
 import NearSnapProvider from './provider';
+import {
+  SignTransactionsParams,
+  Maybe,
+  NearSnapStatus,
+  SignDelegatedTransactionsParams,
+} from './types';
 
 class NearSnap {
   readonly id: string;
@@ -36,6 +41,16 @@ class NearSnap {
     return await this.provider.invokeSnap(this.id, 'near_getAccount', {
       network,
     });
+  }
+
+  async signDelegatedTransactions(
+    transaction: SignDelegatedTransactionsParams,
+  ): Promise<Maybe<{ signature: string; transaction: string }>> {
+    return await this.provider.invokeSnap(
+      this.id,
+      'near_signDelegate',
+      transaction,
+    );
   }
 
   async signTransactions(

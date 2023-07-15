@@ -6,6 +6,7 @@ import {
   Describe,
   enums,
   string,
+  optional,
   number,
 } from 'superstruct';
 
@@ -13,6 +14,8 @@ import {
   NearNetwork,
   SignTransactionsParams,
   TransactionJson,
+  DelegateJson,
+  SignDelegatedTransactionParams,
 } from '../interfaces';
 
 export const networkSchemaDefaulted: Describe<NearNetwork> = defaulted(
@@ -32,10 +35,26 @@ const transaction: Describe<TransactionJson> = object({
   recentBlockHash: string(),
 });
 
+const delegateAction: Describe<DelegateJson> = object({
+  maxBlockHeight: string(),
+  actions: array(any()),
+  publicKey: string(),
+  nonce: string(),
+  receiverId: string(),
+  senderId: string(),
+});
+
 export const signTransactionsSchema: Describe<SignTransactionsParams> = object({
   network: networkSchema,
   transactions: array(transaction),
 });
+
+export const signDelegateSchema: Describe<SignDelegatedTransactionParams> =
+  object({
+    delegateAction,
+    network: networkSchema,
+    payer: optional(string()),
+  });
 
 export const validAccountSchema: Describe<{ network: NearNetwork }> = object({
   network: networkSchema,

@@ -15,6 +15,21 @@ export type TransactionJson = {
   recentBlockHash: string;
 };
 
+export type DelegateJson = {
+  maxBlockHeight: string;
+  actions: Action[];
+  publicKey: string;
+  nonce: string;
+  receiverId: string;
+  senderId: string;
+};
+
+export type SignDelegatedTransactionParams = {
+  network: NearNetwork;
+  delegateAction: DelegateJson;
+  payer?: string;
+};
+
 export type SignTransactionsParams = {
   transactions: TransactionJson[];
   network: NearNetwork;

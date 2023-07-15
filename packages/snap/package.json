@@ -1,6 +1,6 @@
 {
   "name": "@near-snap/plugin",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "View and sign transactions for NEAR Protocol",
   "repository": {
     "type": "git",
@@ -30,6 +30,7 @@
     "@metamask/snaps-types": "^0.32.2",
     "@metamask/snaps-ui": "^0.32.2",
     "@near-js/crypto": "^0.0.5",
+    "@near-js/transactions": "^0.2.1",
     "@near-wallet-selector/core": "^8.2.0",
     "bn.js": "^5.2.1",
     "bs58": "^5.0.0",

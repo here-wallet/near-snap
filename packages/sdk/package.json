@@ -1,6 +1,6 @@
 {
   "name": "@near-snap/sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "homepage": "https://github.com/here-wallet/near-snap#readme",
   "bugs": {
     "url": "https://github.com/here-wallet/near-snap/issues"
@@ -18,11 +18,15 @@
     "start": "tsc --watch"
   },
   "dependencies": {
-    "@near-wallet-selector/core": "^8.2.0",
-    "near-api-js": "^2.1.4"
+    "@near-wallet-selector/core": "^8.2.0"
   },
   "devDependencies": {
     "typescript": "^5.1.6"
+  },
+  "peerDependencies": {
+    "@near-js/transactions": "^0.2.1",
+    "bn.js": "^5.2.1",
+    "near-api-js": "^2.1.4"
   },
   "packageManager": "yarn@3.2.1"
 }

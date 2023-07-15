@@ -1,5 +1,5 @@
 import styled, { useTheme } from 'styled-components';
-import { ReactComponent as MetaMaskFox } from '../assets/metamask_fox.svg';
+import MetaMaskFox from '../assets/metamask_fox.svg';
 import { MetaMask } from './MetaMask';
 import { PoweredBy } from './PoweredBy';
 

@@ -1,9 +1,11 @@
 import { JsonBIP44Node } from '@metamask/key-tree';
 import { KeyPair } from '@near-js/crypto/lib/key_pair';
+import { SnapsGlobalObject } from '@metamask/snaps-types';
+import { InMemoryKeyStore } from 'near-api-js/lib/key_stores';
+import { InMemorySigner } from 'near-api-js/lib/signer';
 import nacl from 'tweetnacl';
 import bs58 from 'bs58';
 
-import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { NearNetwork } from '../interfaces';
 
 const nearNetwork = {
@@ -34,18 +36,12 @@ export async function getKeyPair(
   return KeyPair.fromString(bs58.encode(secretKey));
 }
 
-export async function getAccount(
-  snap: SnapsGlobalObject,
-  network: NearNetwork,
-): Promise<{
-  accountId: string;
-  publicKey: string;
-}> {
+export async function getSigner(snap: SnapsGlobalObject, network: NearNetwork) {
   const keyPair = await getKeyPair(snap, network);
   const accountId = Buffer.from(keyPair.getPublicKey().data).toString('hex');
-  const publicKey = keyPair.getPublicKey().toString();
-  return {
-    accountId,
-    publicKey,
-  };
+
+  const keystore = new InMemoryKeyStore();
+  await keystore.setKey(network, accountId, keyPair);
+  const signer = new InMemorySigner(keystore);
+  return { signer, publicKey: keyPair.getPublicKey(), accountId };
 }

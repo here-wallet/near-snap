@@ -1,5 +1,5 @@
 {
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Sign transaction for NEAR Protocol",
   "proposedName": "NEAR Protocol Snap",
   "repository": {
@@ -7,7 +7,7 @@
     "url": "https://github.com/here-wallet/near-snap.git"
   },
   "source": {
-    "shasum": "0JVWHkRYMXdJmy/GFtSsONP1r0bjifXTxZkmyF9V6Ps=",
+    "shasum": "fd9BZHZnhoFbYZHIIixYbcXVqyZDzfZufexjV+GylHQ=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",

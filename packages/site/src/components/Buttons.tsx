@@ -2,8 +2,8 @@ import { ComponentProps, useContext } from 'react';
 import styled from 'styled-components';
 import { NearSnapStatus } from '@near-snap/sdk';
 
-import { ReactComponent as FlaskFox } from '../assets/flask_fox.svg';
 import { MetaMaskContext } from '../metamask';
+import MetaMaskFlask from './MetaMaskFlask';
 
 const Link = styled.a`
   display: flex;
@@ -73,7 +73,7 @@ const ConnectedIndicator = styled.div`
 
 export const InstallFlaskButton = () => (
   <Link href="https://metamask.io/flask/" target="_blank">
-    <FlaskFox />
+    <MetaMaskFlask />
     <ButtonText>Install MetaMask Flask</ButtonText>
   </Link>
 );
@@ -83,7 +83,7 @@ export const MetamaskButton = (
 ) => {
   return (
     <SButton {...props}>
-      <FlaskFox />
+      <MetaMaskFlask />
       <ButtonText>{props.children}</ButtonText>
     </SButton>
   );

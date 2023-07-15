@@ -16,7 +16,7 @@ const CardWrapper = styled.div<{ disabled: boolean }>`
   background-color: ${({ theme }) => theme.colors.card.default};
   margin-top: 2.4rem;
   margin-bottom: 2.4rem;
-  line-break: anywhere;
+  overflow-wrap: break-word;
   padding: 2.4rem;
   width: 250px;
   border: 1px solid ${({ theme }) => theme.colors.border.default};
@@ -43,6 +43,7 @@ const Title = styled.h2`
 const Description = styled.div`
   margin-top: 2.4rem;
   margin-bottom: 2.4rem;
+  overflow-wrap: break-word;
 `;
 
 export const Card = ({ content, disabled = false }: CardProps) => {

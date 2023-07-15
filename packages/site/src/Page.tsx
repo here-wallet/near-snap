@@ -3,7 +3,7 @@ import { KeyPairEd25519 } from '@near-js/crypto/lib/key_pair_ed25519';
 import { AddKeyAction } from '@near-wallet-selector/core';
 import { NearSnapStatus } from '@near-snap/sdk';
 
-import { MetaMaskContext } from '../metamask';
+import { MetaMaskContext } from './metamask';
 import {
   InstallFlaskButton,
   Card,
@@ -15,7 +15,7 @@ import {
   Span,
   MetamaskButton,
   Button,
-} from '../components';
+} from './components';
 
 const Index = () => {
   const context = useContext(MetaMaskContext);
@@ -30,17 +30,15 @@ const Index = () => {
         params: {
           publicKey: keyPair.publicKey.toString(),
           accessKey: {
-            permission: { receiverId: 'herewallet.testnet' },
+            permission: { receiverId: 'storage.herewallet.near' },
           },
         },
       };
 
-      await account?.signAndSendTransactions([
-        {
-          receiverId: account.target.accountId,
-          actions: [addKey],
-        },
-      ]);
+      await account?.executeTransaction({
+        receiverId: account.accountId,
+        actions: [addKey],
+      });
     } catch (e) {
       console.error(e);
       setError(e);
@@ -133,7 +131,7 @@ const Index = () => {
           <Card
             content={{
               title: 'Hello',
-              description: account.target.accountId,
+              description: account.accountId,
               button: <Button onClick={disconnectWallet}>Disconnect</Button>,
             }}
           />
@@ -150,6 +148,16 @@ const Index = () => {
                 Sign transaction
               </Button>
             ),
+          }}
+        />
+
+        <Card
+          disabled
+          content={{
+            title: 'Sign message',
+            description:
+              'Sign a NEAR Protocol message within a confirmation screen in MetaMask.',
+            button: <Button disabled>Sign message</Button>,
           }}
         />
       </CardContainer>

@@ -53,3 +53,36 @@ await window.ethereum.request({
 // Result, null if transaction was dined
 [["txHash", "signedTrx_hex"], null, ["txHash", "signedTrx_hex"]]
 ```
+
+
+### Sign delegate
+
+```ts
+await window.ethereum.request({
+  method: 'wallet_invokeSnap',
+  params: {
+    snapId: defaultSnapOrigin,
+    request: {
+      method: 'near_signDelegate',
+      params: { 
+        network: 'mainnet', 
+        payer: 'HERE Wallet', // optional
+        delegateAction: {
+          maxBlockHeight: string;
+          actions: Action[];
+          publicKey: string;
+          nonce: string;
+          receiverId: string;
+          senderId: string;
+        } 
+      }
+    }
+  }
+})
+
+// Return
+{
+  transaction: 'base64_signedMessage',
+  signature: 'base58_signature',
+}
+```

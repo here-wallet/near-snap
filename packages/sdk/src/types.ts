@@ -1,5 +1,5 @@
-import { Action, NetworkId } from '@near-wallet-selector/core';
-import { PublicKey } from 'near-api-js/lib/utils';
+import type { Action, NetworkId } from '@near-wallet-selector/core';
+import { transactions } from 'near-api-js';
 
 export declare type Maybe<T> = Partial<T> | null | undefined;
 
@@ -25,13 +25,26 @@ export type TransactionJson = {
   recentBlockHash: string;
 };
 
+export type DelegatedTransaction = {
+  actions: transactions.Action[];
+  blockHeightTtl: number;
+  receiverId: string;
+};
+
 export type SignTransactionsParams = {
   transactions: TransactionJson[];
   network: NetworkId;
 };
 
-export type AccountTarget = {
-  readonly network: NetworkId;
-  readonly accountId: string;
-  readonly publicKey: PublicKey;
+export type SignDelegatedTransactionsParams = {
+  payer?: string;
+  network: NetworkId;
+  delegateAction: {
+    maxBlockHeight: string;
+    actions: Action[];
+    publicKey: string;
+    nonce: string;
+    receiverId: string;
+    senderId: string;
+  };
 };

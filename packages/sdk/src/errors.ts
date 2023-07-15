@@ -1,4 +1,7 @@
-import { FinalExecutionOutcome, Transaction } from '@near-wallet-selector/core';
+import type {
+  FinalExecutionOutcome,
+  Transaction,
+} from '@near-wallet-selector/core';
 
 export class TransactionSignRejected extends Error {
   readonly name = 'TransactionSignRejected';
