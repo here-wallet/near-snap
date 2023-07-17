@@ -4418,7 +4418,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@near-js/signers@npm:0.0.5":
+"@near-js/signers@npm:0.0.5, @near-js/signers@npm:^0.0.5":
   version: 0.0.5
   resolution: "@near-js/signers@npm:0.0.5"
   dependencies:
@@ -4499,8 +4499,10 @@ __metadata:
     "@metamask/snaps-types": ^0.32.2
     "@metamask/snaps-ui": ^0.32.2
     "@near-js/crypto": ^0.0.5
+    "@near-js/signers": ^0.0.5
     "@near-js/transactions": ^0.2.1
     "@near-wallet-selector/core": ^8.2.0
+    "@types/lodash.merge": ^4.6.7
     "@typescript-eslint/eslint-plugin": ^5.33.0
     "@typescript-eslint/parser": ^5.33.0
     bn.js: ^5.2.1
@@ -4513,6 +4515,7 @@ __metadata:
     eslint-plugin-node: ^11.1.0
     eslint-plugin-prettier: ^4.2.1
     jest: ^29.5.0
+    lodash.merge: ^4.6.2
     near-api-js: ^2.1.4
     prettier: ^2.2.1
     prettier-plugin-packagejson: ^2.2.11
@@ -4529,11 +4532,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@near-snap/sdk@workspace:packages/sdk"
   dependencies:
-    "@near-js/transactions": ^0.2.1
     "@near-wallet-selector/core": ^8.2.0
+    typescript: ^5.1.6
+  peerDependencies:
+    "@near-js/transactions": ^0.2.1
     bn.js: ^5.2.1
     near-api-js: ^2.1.4
-    typescript: ^5.1.6
   languageName: unknown
   linkType: soft
 
@@ -6225,6 +6229,15 @@ __metadata:
   version: 0.0.29
   resolution: "@types/json5@npm:0.0.29"
   checksum: e60b153664572116dfea673c5bda7778dbff150498f44f998e34b5886d8afc47f16799280e4b6e241c0472aef1bc36add771c569c68fc5125fc2ae519a3eb9ac
+  languageName: node
+  linkType: hard
+
+"@types/lodash.merge@npm:^4.6.7":
+  version: 4.6.7
+  resolution: "@types/lodash.merge@npm:4.6.7"
+  dependencies:
+    "@types/lodash": "*"
+  checksum: 94cd6fb8e606756a28f45d63c658aacfbce11a151f7fa322c4a3e87aa50d8bf26e0ae8cba0250070a7c5a6792fc51f79abf4c648bbb1850692be386cd76cd0ca
   languageName: node
   linkType: hard
 

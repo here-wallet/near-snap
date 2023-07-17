@@ -20,7 +20,6 @@ export const waitTransactionResult = async (
   try {
     logs = await provider.txStatus(txHash, accountId);
   } catch {
-    console.log('Transaction is not exist yet');
     return await waitTransactionResult(txHash, accountId, provider);
   }
 
@@ -45,7 +44,6 @@ export const waitTransactionResult = async (
         if (status === ExecutionStatusBasic.Failure) {
           errors.push(status);
         }
-
         return false;
       }
 
@@ -54,12 +52,10 @@ export const waitTransactionResult = async (
         return false;
       }
 
-      if (status.SuccessValue) {
+      if (typeof status.SuccessValue === 'string') {
         if (receipts[id].receipt_ids.length === 0) {
           return true;
         }
-
-        return checkReceipts(receipts[id].receipt_ids);
       }
 
       return checkReceipts(receipts[id].receipt_ids);

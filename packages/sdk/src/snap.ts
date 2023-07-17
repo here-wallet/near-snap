@@ -43,6 +43,30 @@ class NearSnap {
     });
   }
 
+  async connect(data: {
+    network: NetworkId;
+    contractId?: string;
+    methods?: string[];
+  }): Promise<Maybe<{ accountId: string; publicKey: string }>> {
+    return await this.provider.invokeSnap(this.id, 'near_connect', data);
+  }
+
+  async disconnect(data: { network: NetworkId }) {
+    return await this.provider.invokeSnap(this.id, 'near_disconnect', data);
+  }
+
+  async getPermissions(network: NetworkId) {
+    return await this.provider.invokeSnap(this.id, 'near_getPermissions', {
+      network,
+    });
+  }
+
+  async needActivate(network: NetworkId) {
+    return await this.provider.invokeSnap(this.id, 'near_needActivate', {
+      network,
+    });
+  }
+
   async signDelegatedTransactions(
     transaction: SignDelegatedTransactionsParams,
   ): Promise<Maybe<{ signature: string; transaction: string }>> {

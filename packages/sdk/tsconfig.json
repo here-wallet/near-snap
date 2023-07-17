@@ -1,14 +1,21 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "module": "esnext",
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "alwaysStrict": true,
+    "allowJs": true,
+    "strict": true,
     "rootDir": "./src",
     "outDir": "./build",
     "declaration": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "target": "es6",
-    "jsx": "preserve"
+    "sourceMap": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    "target": "es2015",
+    "module": "CommonJS",
+    "lib": ["ESNext", "dom"]
   },
   "include": ["src", "index.d.ts"]
 }

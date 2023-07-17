@@ -8,9 +8,11 @@ import base58 from 'bs58';
 import {
   SignDelegatedTransactionParams,
   SignTransactionsParams,
+  TransactionJson,
 } from '../interfaces';
 import { createAction } from './createAction';
 import { viewDelegate, viewTransactions } from './viewTransactions';
+import { getPermissions } from './permissions';
 import { getSigner } from './getAccount';
 
 export async function signDelegatedTransaction(
@@ -50,64 +52,100 @@ export async function signDelegatedTransaction(
   };
 }
 
+const signTransaction = async (options: {
+  tx: TransactionJson;
+  accountId: string;
+  signer: any;
+  publicKey: PublicKey;
+  network: string;
+}): Promise<[string, string]> => {
+  const { tx, accountId, signer, publicKey, network } = options;
+  const transaction = transactions.createTransaction(
+    accountId,
+    publicKey,
+    tx.receiverId,
+    tx.nonce,
+    tx.actions.map(createAction),
+    base58.decode(tx.recentBlockHash),
+  );
+
+  const signedTransaction = await transactions.signTransaction(
+    transaction,
+    signer,
+    accountId,
+    network,
+  );
+
+  return [
+    Buffer.from(signedTransaction[0]).toString('hex'),
+    Buffer.from(signedTransaction[1].encode()).toString('hex'),
+  ];
+};
+
 export async function signTransactions(
   origin: string,
   snap: SnapsGlobalObject,
   params: SignTransactionsParams,
 ): Promise<([string, string] | null)[]> {
   const signedTransactions: ([string, string] | null)[] = [];
-  const { transactions: transactionsArray, network } = params;
+  const { transactions: trxs, network } = params;
   const { signer, publicKey, accountId } = await getSigner(snap, network);
-  const dialogs = viewTransactions(
-    origin,
-    transactionsArray,
-    accountId,
-    network,
-  );
 
-  let index = 0;
+  if (trxs.length === 1 && trxs[0].actions.length === 1) {
+    const { receiverId, actions } = trxs[0];
+    const { type } = actions[0];
 
-  for (const transactionData of transactionsArray) {
-    try {
-      const confirmation = await snap.request({
-        method: 'snap_dialog',
-        params: {
-          type: 'confirmation',
-          content: dialogs[index],
-        },
+    if (type === 'FunctionCall' && actions[0].params.deposit === '0') {
+      const { methodName } = actions[0].params;
+      const permissions = await getPermissions({
+        network: params.network,
+        origin,
+        snap,
       });
 
-      index += 1;
-      if (!confirmation) {
-        signedTransactions.push(null);
-        continue;
+      const methods = permissions?.[receiverId];
+      if (methods && (methods.length === 0 || methods.includes(methodName))) {
+        const result = await signTransaction({
+          tx: trxs[0],
+          accountId,
+          network,
+          publicKey,
+          signer,
+        });
+
+        return [result];
       }
-
-      const transaction = transactions.createTransaction(
-        accountId,
-        publicKey,
-        transactionData.receiverId,
-        transactionData.nonce,
-        transactionData.actions.map(createAction),
-        base58.decode(transactionData.recentBlockHash),
-      );
-
-      const signedTransaction = await transactions.signTransaction(
-        transaction,
-        signer,
-        accountId,
-        network,
-      );
-
-      signedTransactions.push([
-        Buffer.from(signedTransaction[0]).toString('hex'),
-        Buffer.from(signedTransaction[1].encode()).toString('hex'),
-      ]);
-    } catch (e) {
-      throw new Error(
-        `Failed to sign transaction because: ${(e as Error).message}`,
-      );
     }
   }
+
+  let index = 0;
+  const dialogs = viewTransactions(origin, trxs, accountId, network);
+
+  for (const tx of trxs) {
+    const confirmation = await snap.request({
+      method: 'snap_dialog',
+      params: {
+        type: 'confirmation',
+        content: dialogs[index],
+      },
+    });
+
+    index += 1;
+    if (!confirmation) {
+      signedTransactions.push(null);
+      continue;
+    }
+
+    signedTransactions.push(
+      await signTransaction({
+        accountId,
+        network,
+        publicKey,
+        signer,
+        tx,
+      }),
+    );
+  }
+
   return signedTransactions;
 }

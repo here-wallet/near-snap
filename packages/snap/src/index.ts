@@ -1,8 +1,8 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { copyable, heading, panel, text } from '@metamask/snaps-ui';
 import { assert } from 'superstruct';
 
 import {
+  connectWalletSchema,
   signDelegateSchema,
   signTransactionsSchema,
   validAccountSchema,
@@ -11,10 +11,15 @@ import {
   signDelegatedTransaction,
   signTransactions,
 } from './core/signTransactions';
-import { getSigner } from './core/getAccount';
+import { getAccount, needActivate } from './core/getAccount';
+import { connectApp, disconnectApp, getPermissions } from './core/permissions';
 
 enum Methods {
+  NeedActivate = 'near_needActivate',
   GetAddress = 'near_getAccount',
+  ConnectApp = 'near_connect',
+  DisconnectApp = 'near_disconnect',
+  GetPermissions = 'near_getPermissions',
   SignTransaction = 'near_signTransactions',
   SignDelegate = 'near_signDelegate',
 }
@@ -26,34 +31,29 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   switch (request.method) {
     case Methods.GetAddress: {
       assert(request.params, validAccountSchema);
-
-      const account = await getSigner(snap, request.params.network);
-      const type = request.params.network === 'testnet' ? '**testnet**' : '';
-      const publicKey = account.publicKey.toString();
-
-      const isConfirmed = await snap.request({
-        method: 'snap_dialog',
-        params: {
-          type: 'confirmation',
-          content: panel([
-            text(`Site **${origin}**`),
-            heading('Asking for your public data:'),
-
-            text(`Your ${type} address:`),
-            copyable(account.accountId),
-
-            text('Your public key:'),
-            copyable(publicKey),
-          ]),
-        },
-      });
-
-      if (!isConfirmed) {
-        throw Error('Access is denied');
-      }
-
-      return { publicKey, accountId: account.accountId };
+      return await getAccount(snap, request.params.network, origin);
     }
+
+    case Methods.NeedActivate: {
+      assert(request.params, validAccountSchema);
+      const { network } = request.params;
+      return await needActivate({ snap, origin, network });
+    }
+
+    case Methods.GetPermissions: {
+      assert(request.params, validAccountSchema);
+      const { network } = request.params;
+      return await getPermissions({ snap, origin, network });
+    }
+
+    case Methods.ConnectApp:
+      assert(request.params, connectWalletSchema);
+      return await connectApp({ origin, snap, ...request.params });
+
+    case Methods.DisconnectApp:
+      assert(request.params, validAccountSchema);
+      await disconnectApp({ origin, snap, ...request.params });
+      return true;
 
     case Methods.SignDelegate:
       assert(request.params, signDelegateSchema);

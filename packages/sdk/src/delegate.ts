@@ -4,18 +4,46 @@ import { transactions } from 'near-api-js';
 
 export type DelegateProvderProtocol = {
   payer: string;
-  isCanDelegate(action: DelegateAction): Promise<boolean>;
-  sendDelegate(action: SignedDelegate): Promise<string>;
+  activateAccount(
+    accountId: string,
+    publicKey: string,
+    network: string,
+  ): Promise<void>;
+  isCanDelegate(action: DelegateAction, network?: string): Promise<boolean>;
+  sendDelegate(action: SignedDelegate, network?: string): Promise<string>;
 };
 
 export class DelegateNotAllowed extends Error {}
+
+export class DelegateRequestError extends Error {
+  //
+}
 
 export class HEREDelegateProvider implements DelegateProvderProtocol {
   endpoint = 'https://api.herewallet.app/api/v1';
 
   payer = 'HERE Wallet';
 
-  async isCanDelegate(action: DelegateAction) {
+  async activateAccount(accountId: string, publicKey: string, network: string) {
+    await fetch(`${this.endpoint}/user/create_near_username`, {
+      method: 'POST',
+      body: JSON.stringify({
+        near_account_id: accountId,
+        device_id: 'metamask',
+        public_key: publicKey,
+        sign: '',
+      }),
+      headers: {
+        Network: network,
+      },
+    });
+  }
+
+  async isCanDelegate(action: DelegateAction, network = 'mainnet') {
+    if (network !== 'mainnet') {
+      return false;
+    }
+
     const trxBase64 = Buffer.from(
       transactions.encodeDelegateAction(action),
     ).toString('base64');
@@ -29,7 +57,11 @@ export class HEREDelegateProvider implements DelegateProvderProtocol {
     return allowed;
   }
 
-  async sendDelegate(action: SignedDelegate) {
+  async sendDelegate(action: SignedDelegate, network = 'mainnet') {
+    if (network !== 'mainnet') {
+      throw new DelegateNotAllowed();
+    }
+
     const trxBase64 = Buffer.from(
       transactions.encodeDelegateAction(action.delegateAction),
     ).toString('base64');
@@ -44,6 +76,10 @@ export class HEREDelegateProvider implements DelegateProvderProtocol {
         }),
       },
     );
+
+    if (!response.ok) {
+      throw new DelegateRequestError(await response.text());
+    }
 
     const { hash } = await response.json();
     return hash;

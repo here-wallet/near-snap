@@ -19,7 +19,10 @@ export type MetamaskState = {
 };
 
 export const snap = new NearSnap({
-  id: process.env.GATSBY_SNAP_ORIGIN ?? 'local:http://localhost:3000',
+  id:
+    process.env.NODE_ENV === 'production'
+      ? 'npm:@near-snap/plugin'
+      : 'local:http://localhost:3000',
 });
 
 export const MetaMaskContext = createContext<MetamaskState>({
@@ -40,6 +43,7 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     snap.getStatus().then(setStatus).catch(setError);
+    NearSnapAccount.restore({ network: 'mainnet', snap }).then(setAccount);
   }, [snap]);
 
   useEffect(() => {
@@ -62,7 +66,11 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
 
   const connectWallet = useCallback(async () => {
     try {
-      const snapAccount = await NearSnapAccount.connect('mainnet', snap);
+      const snapAccount = await NearSnapAccount.connect({
+        network: 'mainnet',
+        snap,
+      });
+
       setAccount(snapAccount);
     } catch (e) {
       console.log(e);
@@ -70,7 +78,15 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const disconnectWallet = useCallback(() => setAccount(null), []);
+  const disconnectWallet = useCallback(async () => {
+    try {
+      await account?.disconnect();
+      setAccount(null);
+    } catch (e) {
+      console.log(e);
+      setError(e);
+    }
+  }, [account]);
 
   return (
     <MetaMaskContext.Provider

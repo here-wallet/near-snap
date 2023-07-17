@@ -13,6 +13,18 @@ const formatAmount = (amount: string) => {
   return `${near} NEAR`;
 };
 
+const formatAddress = (addr: string) => {
+  if (addr.endsWith('.near') && addr.length > 22) {
+    return `${addr.slice(0, 9)}..${addr.slice(-10)}`;
+  }
+
+  if (addr.length > 18) {
+    return `${addr.slice(0, 8)}..${addr.slice(-8)}`;
+  }
+
+  return addr;
+};
+
 export const viewAction = (action: Action) => {
   const view = panel([]);
   view.children.push(divider());
@@ -21,9 +33,9 @@ export const viewAction = (action: Action) => {
   switch (action.type) {
     case 'FunctionCall':
       view.children.push(
-        text(`Method: ${action.params.methodName}`),
-        text(`Deposit: ${formatAmount(action.params.deposit)}`),
-        text(`Gas: ${Math.round(Number(action.params.gas) / TGAS)} TGas`),
+        text(`Method: **${action.params.methodName}**`),
+        text(`Deposit: **${formatAmount(action.params.deposit)}**`),
+        text(`Gas: **${Math.round(Number(action.params.gas) / TGAS)} TGas**`),
         text(`Args:`),
         copyable(JSON.stringify(action.params.args, null, 2)),
       );
@@ -31,7 +43,7 @@ export const viewAction = (action: Action) => {
 
     case 'Transfer':
       view.children.push(
-        text(`Deposit: ${formatAmount(action.params.deposit)}`),
+        text(`Deposit: **${formatAmount(action.params.deposit)}**`),
       );
       return view;
 
@@ -45,25 +57,27 @@ export const viewAction = (action: Action) => {
 
     case 'AddKey': {
       if (action.params.accessKey.permission === 'FullAccess') {
+        const warning =
+          '**WARNING! With this key you give access to all your NEAR account assets.**';
+
         view.children.push(
-          text(
-            '**WARNING! With this key you give access to all your NEAR account assets.**',
-          ),
+          text(warning),
           text('Public key:'),
           copyable(action.params.publicKey),
         );
+
         return view;
       }
 
       const { allowance, receiverId, methodNames } =
         action.params.accessKey.permission;
 
-      view.children.push(text(`Receiver: ${receiverId}`));
+      view.children.push(text(`Receiver: **${formatAddress(receiverId)}**`));
       if (allowance !== undefined) {
-        view.children.push(text(`Allowance: ${formatAmount(allowance)}`));
+        view.children.push(text(`Allowance: **${formatAmount(allowance)}**`));
       }
 
-      if (methodNames !== undefined) {
+      if (methodNames !== undefined && methodNames.length > 0) {
         view.children.push(text(`Methods: ${methodNames.join(', ')}`));
       }
 
@@ -89,23 +103,24 @@ export const viewDelegate = (data: {
   payer?: string;
 }) => {
   const view = panel([]);
-  const header = heading(`Sign Delegated Transaction`);
+  const header = heading(`Sign Transaction`);
   const type = data.network === 'testnet' ? '**[testnet]**' : '';
+  const { accountId, origin, payer, action } = data;
 
   view.children.push(header);
-  view.children.push(text(`Site: ${data.origin}`));
-  view.children.push(text(`Your account: ${type} ${data.accountId}`));
-  view.children.push(text(`Receiver: ${data.action.receiverId}`));
-
+  view.children.push(text(`Site: **${origin}**`));
   view.children.push(
-    text(
-      `_This transaction will be paid by **${
-        data.payer ?? 'another account'
-      }**. It is safe and free._`,
-    ),
+    text(`Your account: ${type} **${formatAddress(accountId)}**`),
+  );
+  view.children.push(text(`Receiver: **${formatAddress(action.receiverId)}**`));
+
+  const gasFree = 'The commission of this transaction will be paid by';
+  view.children.push(
+    divider(),
+    heading('GAS Free:'),
+    text(`${gasFree} **${payer ?? 'another account'}**.`),
   );
 
-  view.children.push(text(''));
   view.children.push(...data.action.actions.map(viewAction));
   return view;
 };
@@ -120,10 +135,12 @@ export const viewTransactions = (
     const view = panel([]);
     const header = heading(`Sign Transaction (${index + 1}/${txArray.length})`);
     const type = network === 'testnet' ? '**[testnet]**' : '';
+    const addr = formatAddress(accountId);
+
     view.children.push(header);
-    view.children.push(text(`Site: ${origin}`));
-    view.children.push(text(`Your account: ${type} ${accountId}`));
-    view.children.push(text(`Receiver: ${tx.receiverId}`));
+    view.children.push(text(`Site: **${origin}**`));
+    view.children.push(text(`Your account: ${type} **${addr}**`));
+    view.children.push(text(`Receiver: **${formatAddress(tx.receiverId)}**`));
     view.children.push(text(''));
     view.children.push(...tx.actions.map(viewAction));
     return view;

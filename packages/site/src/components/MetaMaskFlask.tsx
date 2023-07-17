@@ -117,9 +117,9 @@ const MetaMaskFlask = () => {
         d="M11.9835 14.8315L11.6197 14.5816H9.52046L9.15667 14.8315L8.95972 16.5062L9.14277 16.3396H11.9998L12.1898 16.5062L11.9835 14.8315Z"
         fill="#161616"
         stroke="#161616"
-        stroke-width="0.00668686"
-        stroke-miterlimit="10"
-        stroke-linejoin="round"
+        strokeWidth="0.00668686"
+        strokeMiterlimit="10"
+        strokeLinejoin="round"
       />
       <path
         d="M12.7505 10.6794L12.1202 11.9978L14.2659 11.3687L12.7505 10.6794Z"
@@ -138,8 +138,8 @@ const MetaMaskFlask = () => {
           y2="14.5805"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#FB7FE4" />
-          <stop offset="1" stop-color="#BCABFB" />
+          <stop stopColor="#FB7FE4" />
+          <stop offset="1" stopColor="#BCABFB" />
         </linearGradient>
         <linearGradient
           id="paint1_linear_205_1983"
@@ -149,8 +149,8 @@ const MetaMaskFlask = () => {
           y2="13.103"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#B65FE5" />
-          <stop offset="1" stop-color="#ADA2FC" />
+          <stop stopColor="#B65FE5" />
+          <stop offset="1" stopColor="#ADA2FC" />
         </linearGradient>
         <linearGradient
           id="paint2_linear_205_1983"
@@ -160,8 +160,8 @@ const MetaMaskFlask = () => {
           y2="13.103"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#B65FE5" />
-          <stop offset="1" stop-color="#ADA2FC" />
+          <stop stopColor="#B65FE5" />
+          <stop offset="1" stopColor="#ADA2FC" />
         </linearGradient>
         <linearGradient
           id="paint3_linear_205_1983"
@@ -171,8 +171,8 @@ const MetaMaskFlask = () => {
           y2="13.0992"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#C8A8F7" />
-          <stop offset="1" stop-color="#BAAAFB" />
+          <stop stopColor="#C8A8F7" />
+          <stop offset="1" stopColor="#BAAAFB" />
         </linearGradient>
         <linearGradient
           id="paint4_linear_205_1983"
@@ -182,8 +182,8 @@ const MetaMaskFlask = () => {
           y2="13.0992"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#C8A8F7" />
-          <stop offset="1" stop-color="#BAAAFB" />
+          <stop stopColor="#C8A8F7" />
+          <stop offset="1" stopColor="#BAAAFB" />
         </linearGradient>
         <linearGradient
           id="paint5_linear_205_1983"
@@ -193,10 +193,10 @@ const MetaMaskFlask = () => {
           y2="3.25322"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#541758" />
-          <stop offset="0.4286" stop-color="#4F206C" />
-          <stop offset="0.62" stop-color="#4D2577" />
-          <stop offset="1" stop-color="#8B45B6" />
+          <stop stopColor="#541758" />
+          <stop offset="0.4286" stopColor="#4F206C" />
+          <stop offset="0.62" stopColor="#4D2577" />
+          <stop offset="1" stopColor="#8B45B6" />
         </linearGradient>
         <linearGradient
           id="paint6_linear_205_1983"
@@ -206,10 +206,10 @@ const MetaMaskFlask = () => {
           y2="2.07384"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#541758" />
-          <stop offset="0.4286" stop-color="#4F206C" />
-          <stop offset="0.62" stop-color="#4D2577" />
-          <stop offset="1" stop-color="#8B45B6" />
+          <stop stopColor="#541758" />
+          <stop offset="0.4286" stopColor="#4F206C" />
+          <stop offset="0.62" stopColor="#4D2577" />
+          <stop offset="1" stopColor="#8B45B6" />
         </linearGradient>
         <linearGradient
           id="paint7_linear_205_1983"
@@ -219,10 +219,10 @@ const MetaMaskFlask = () => {
           y2="11.3603"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#BA86F3" />
-          <stop offset="0.5281" stop-color="#B786F4" />
-          <stop offset="0.8987" stop-color="#AE86F5" />
-          <stop offset="1" stop-color="#AA86F6" />
+          <stop stopColor="#BA86F3" />
+          <stop offset="0.5281" stopColor="#B786F4" />
+          <stop offset="0.8987" stopColor="#AE86F5" />
+          <stop offset="1" stopColor="#AA86F6" />
         </linearGradient>
         <linearGradient
           id="paint8_linear_205_1983"
@@ -232,10 +232,10 @@ const MetaMaskFlask = () => {
           y2="11.3603"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#BA86F3" />
-          <stop offset="0.5281" stop-color="#B786F4" />
-          <stop offset="0.8987" stop-color="#AE86F5" />
-          <stop offset="1" stop-color="#AA86F6" />
+          <stop stopColor="#BA86F3" />
+          <stop offset="0.5281" stopColor="#B786F4" />
+          <stop offset="0.8987" stopColor="#AE86F5" />
+          <stop offset="1" stopColor="#AA86F6" />
         </linearGradient>
         <linearGradient
           id="paint9_linear_205_1983"
@@ -245,8 +245,8 @@ const MetaMaskFlask = () => {
           y2="17.2628"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#906EF7" />
-          <stop offset="1" stop-color="#575ADE" />
+          <stop stopColor="#906EF7" />
+          <stop offset="1" stopColor="#575ADE" />
         </linearGradient>
         <linearGradient
           id="paint10_linear_205_1983"
@@ -256,8 +256,8 @@ const MetaMaskFlask = () => {
           y2="17.2628"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#906EF7" />
-          <stop offset="1" stop-color="#575ADE" />
+          <stop stopColor="#906EF7" />
+          <stop offset="1" stopColor="#575ADE" />
         </linearGradient>
         <linearGradient
           id="paint11_linear_205_1983"
@@ -267,8 +267,8 @@ const MetaMaskFlask = () => {
           y2="2.72998"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#BB65ED" />
-          <stop offset="1" stop-color="#E560E3" />
+          <stop stopColor="#BB65ED" />
+          <stop offset="1" stopColor="#E560E3" />
         </linearGradient>
         <linearGradient
           id="paint12_linear_205_1983"
@@ -278,10 +278,10 @@ const MetaMaskFlask = () => {
           y2="2.72998"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#E560E3" />
-          <stop offset="0.2946" stop-color="#DE61E5" />
-          <stop offset="0.7098" stop-color="#CC63E9" />
-          <stop offset="1" stop-color="#BB65ED" />
+          <stop stopColor="#E560E3" />
+          <stop offset="0.2946" stopColor="#DE61E5" />
+          <stop offset="0.7098" stopColor="#CC63E9" />
+          <stop offset="1" stopColor="#BB65ED" />
         </linearGradient>
         <linearGradient
           id="paint13_linear_205_1983"
@@ -291,8 +291,8 @@ const MetaMaskFlask = () => {
           y2="9.80699"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#DC69E6" />
-          <stop offset="1" stop-color="#C289F3" />
+          <stop stopColor="#DC69E6" />
+          <stop offset="1" stopColor="#C289F3" />
         </linearGradient>
         <linearGradient
           id="paint14_linear_205_1983"
@@ -302,8 +302,8 @@ const MetaMaskFlask = () => {
           y2="9.80699"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#DC69E6" />
-          <stop offset="1" stop-color="#C289F3" />
+          <stop stopColor="#DC69E6" />
+          <stop offset="1" stopColor="#C289F3" />
         </linearGradient>
         <linearGradient
           id="paint15_linear_205_1983"
@@ -313,8 +313,8 @@ const MetaMaskFlask = () => {
           y2="17.035"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#6848BA" />
-          <stop offset="0.3363" stop-color="#6356D5" />
+          <stop stopColor="#6848BA" />
+          <stop offset="0.3363" stopColor="#6356D5" />
         </linearGradient>
         <linearGradient
           id="paint16_linear_205_1983"
@@ -324,8 +324,8 @@ const MetaMaskFlask = () => {
           y2="16.0807"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#6848BA" />
-          <stop offset="0.3363" stop-color="#6356D5" />
+          <stop stopColor="#6848BA" />
+          <stop offset="0.3363" stopColor="#6356D5" />
         </linearGradient>
         <linearGradient
           id="paint17_linear_205_1983"
@@ -335,10 +335,10 @@ const MetaMaskFlask = () => {
           y2="9.80701"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#BA86F3" />
-          <stop offset="0.5281" stop-color="#B786F4" />
-          <stop offset="0.8987" stop-color="#AE86F5" />
-          <stop offset="1" stop-color="#AA86F6" />
+          <stop stopColor="#BA86F3" />
+          <stop offset="0.5281" stopColor="#B786F4" />
+          <stop offset="0.8987" stopColor="#AE86F5" />
+          <stop offset="1" stopColor="#AA86F6" />
         </linearGradient>
         <linearGradient
           id="paint18_linear_205_1983"
@@ -348,10 +348,10 @@ const MetaMaskFlask = () => {
           y2="12.1938"
           gradientUnits="userSpaceOnUse"
         >
-          <stop stop-color="#BA86F3" />
-          <stop offset="0.5281" stop-color="#B786F4" />
-          <stop offset="0.8987" stop-color="#AE86F5" />
-          <stop offset="1" stop-color="#AA86F6" />
+          <stop stopColor="#BA86F3" />
+          <stop offset="0.5281" stopColor="#B786F4" />
+          <stop offset="0.8987" stopColor="#AE86F5" />
+          <stop offset="1" stopColor="#AA86F6" />
         </linearGradient>
       </defs>
     </svg>

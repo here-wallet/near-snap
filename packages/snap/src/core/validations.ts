@@ -33,6 +33,7 @@ const transaction: Describe<TransactionJson> = object({
   actions: array(any()),
   nonce: number(),
   recentBlockHash: string(),
+  signerId: optional(string()),
 });
 
 const delegateAction: Describe<DelegateJson> = object({
@@ -57,5 +58,15 @@ export const signDelegateSchema: Describe<SignDelegatedTransactionParams> =
   });
 
 export const validAccountSchema: Describe<{ network: NearNetwork }> = object({
+  network: networkSchema,
+});
+
+export const connectWalletSchema: Describe<{
+  methods?: string[];
+  contractId?: string;
+  network: NearNetwork;
+}> = object({
+  contractId: optional(string()),
+  methods: optional(array(string())),
   network: networkSchema,
 });

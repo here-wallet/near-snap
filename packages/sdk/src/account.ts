@@ -18,7 +18,7 @@ import {
 } from 'near-api-js/lib/providers/provider';
 import { BN } from 'bn.js';
 
-import { waitTransactionResult } from './utils/waitTransaction';
+import { wait, waitTransactionResult } from './utils/waitTransaction';
 import { convertAction } from './utils/convertAction';
 import { createAction } from './utils/createAction';
 
@@ -28,6 +28,7 @@ import NearSnap from './snap';
 import {
   DelegateNotAllowed,
   DelegateProvderProtocol,
+  DelegateRequestError,
   HEREDelegateProvider,
 } from './delegate';
 
@@ -41,7 +42,7 @@ class NearSnapAccount extends Account {
 
   readonly publicKey: PublicKey;
 
-  readonly delegateProvider: DelegateProvderProtocol;
+  readonly delegateProvider?: DelegateProvderProtocol;
 
   constructor(options: {
     snap?: NearSnap;
@@ -64,6 +65,24 @@ class NearSnapAccount extends Account {
     this.snap = options.snap ?? new NearSnap();
     this.delegateProvider =
       options.delegateProvider ?? new HEREDelegateProvider();
+  }
+
+  get network() {
+    return this.connection.networkId as NetworkId;
+  }
+
+  async connect(contractId: string, methods: string[] = []) {
+    return await this.snap.connect({
+      network: this.network,
+      contractId,
+      methods,
+    });
+  }
+
+  async disconnect() {
+    return await this.snap.disconnect({
+      network: this.network,
+    });
   }
 
   async signMessage() {
@@ -97,22 +116,37 @@ class NearSnapAccount extends Account {
     ];
   }
 
+  async activateIfNeeded() {
+    try {
+      await this.getLastNonce();
+    } catch {
+      if (!this.delegateProvider) {
+        await this.snap.needActivate(this.network);
+        return;
+      }
+
+      try {
+        await this.delegateProvider?.activateAccount(
+          this.accountId,
+          this.publicKey.toString(),
+          this.network,
+        );
+        await wait(1000);
+      } catch {
+        await this.snap.needActivate(this.network);
+      }
+    }
+  }
+
   async getLastNonce() {
-    const access = await this.connection.provider
-      .query<{ nonce: number } & QueryResponseKind>({
-        request_type: 'view_access_key',
-        public_key: this.publicKey.toString(),
-        account_id: this.accountId,
-        finality: 'final',
-      })
-      .catch(async () => {
-        const r = await this.connection.provider.block({ finality: 'final' });
-        return {
-          block_height: r.header.height,
-          block_hash: r.header.hash,
-          nonce: 1,
-        };
-      });
+    const access = await this.connection.provider.query<
+      { nonce: number } & QueryResponseKind
+    >({
+      request_type: 'view_access_key',
+      public_key: this.publicKey.toString(),
+      account_id: this.accountId,
+      finality: 'final',
+    });
 
     return access;
   }
@@ -173,12 +207,17 @@ class NearSnapAccount extends Account {
   async buildDelegateAction(
     tx: Omit<Transaction, 'signerId'> | DelegateAction,
   ) {
-    const access = await this.getLastNonce();
+    if (!this.delegateProvider) {
+      throw new DelegateNotAllowed();
+    }
+
     if (tx instanceof DelegateAction) {
-      const allowed = await this.delegateProvider.isCanDelegate(tx);
+      const network = this.connection.networkId;
+      const allowed = await this.delegateProvider.isCanDelegate(tx, network);
       return { action: tx, allowed };
     }
 
+    const access = await this.getLastNonce();
     const action = buildDelegateAction({
       actions: tx.actions.map(createAction),
       maxBlockHeight: new BN(access.block_height).add(new BN(100)),
@@ -188,13 +227,18 @@ class NearSnapAccount extends Account {
       receiverId: tx.receiverId,
     });
 
-    const allowed = await this.delegateProvider.isCanDelegate(action);
+    const network = this.connection.networkId;
+    const allowed = await this.delegateProvider.isCanDelegate(action, network);
     return { action, allowed };
   }
 
   async executeDelegate(tx: Omit<Transaction, 'signerId'> | DelegateAction) {
+    if (!this.delegateProvider) {
+      throw new DelegateNotAllowed();
+    }
+
     const { action, allowed } = await this.buildDelegateAction(tx);
-    if (allowed) {
+    if (!allowed) {
       const msg = `Delegated transaction is now allowed by ${this.delegateProvider.payer}. Try other DelegateProvider`;
       throw new DelegateNotAllowed(msg);
     }
@@ -206,24 +250,30 @@ class NearSnapAccount extends Account {
       blockHeightTtl: 100,
     });
 
-    const { provider } = this.connection;
-    const hash = await this.delegateProvider.sendDelegate(delegate);
+    const { provider, networkId } = this.connection;
+    const hash = await this.delegateProvider.sendDelegate(delegate, networkId);
     return await waitTransactionResult(hash, this.accountId, provider);
   }
 
   async executeTransaction(
     tx: Omit<Transaction, 'signerId'> & { disableDelegate?: boolean },
   ) {
-    if (tx.disableDelegate) {
-      const result = await this.executeTransactions([tx]);
-      return result[0];
-    }
-
     try {
+      if (tx.disableDelegate) {
+        throw new DelegateNotAllowed();
+      }
+
       return await this.executeDelegate(tx);
-    } catch {
-      const result = await this.executeTransactions([tx]);
-      return result[0];
+    } catch (e) {
+      if (
+        e instanceof DelegateNotAllowed ||
+        e instanceof DelegateRequestError
+      ) {
+        const result = await this.executeTransactions([tx]);
+        return result[0];
+      }
+
+      throw e;
     }
   }
 
@@ -264,7 +314,45 @@ class NearSnapAccount extends Account {
     return result;
   }
 
-  static async connect(network: NetworkId, snap = new NearSnap()) {
+  static async restore({
+    network,
+    delegateProvider,
+    snap = new NearSnap(),
+  }: {
+    network: NetworkId;
+    delegateProvider?: DelegateProvderProtocol;
+    snap?: NearSnap;
+  }) {
+    const account = await snap.getAccount(network).catch(() => null);
+    if (!account?.accountId || !account?.publicKey) {
+      return null;
+    }
+
+    const acc = new NearSnapAccount({
+      publicKey: PublicKey.fromString(account.publicKey),
+      accountId: account.accountId,
+      delegateProvider,
+      network,
+      snap,
+    });
+
+    await acc.activateIfNeeded();
+    return acc;
+  }
+
+  static async connect({
+    snap = new NearSnap(),
+    delegateProvider,
+    contractId,
+    methods,
+    network,
+  }: {
+    delegateProvider?: DelegateProvderProtocol;
+    contractId?: string;
+    methods?: string[];
+    network: NetworkId;
+    snap: NearSnap;
+  }) {
     const status = await snap.getStatus();
     if (status === NearSnapStatus.NOT_SUPPORTED) {
       throw Error('You need install Metamask Flask');
@@ -274,7 +362,12 @@ class NearSnapAccount extends Account {
       await snap.install();
     }
 
-    const account = await snap.getAccount(network);
+    const account = await snap.connect({
+      contractId,
+      methods,
+      network,
+    });
+
     if (!account?.accountId) {
       throw Error('Metamask Near Snap did not return account id');
     }
@@ -283,12 +376,16 @@ class NearSnapAccount extends Account {
       throw Error('Metamask Near Snap did not return public key');
     }
 
-    return new NearSnapAccount({
+    const acc = new NearSnapAccount({
+      delegateProvider,
       publicKey: PublicKey.fromString(account.publicKey),
       accountId: account.accountId,
       network,
       snap,
     });
+
+    await acc.activateIfNeeded();
+    return acc;
   }
 }
 
