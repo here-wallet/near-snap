@@ -1,6 +1,9 @@
 # NEAR Protocol Snap
 
-View and sign transactions for NEAR Protocol blockchain
+View and sign transactions for NEAR Protocol blockchain.
+
+**Created by BANYAN and HERE Wallet**
+
 
 ### Safe and secure. 
 
@@ -9,7 +12,6 @@ When you sign transactions, you see exactly what you are signing. **The plugin d
 
 ### Full transparency
 Thanks to the preview of incoming transactions, you know exactly what you are signing. Without your consent, **no third party application will receive your public key.**
-
 
 ### @near-snap/sdk
 

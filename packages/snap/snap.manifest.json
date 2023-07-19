@@ -1,13 +1,13 @@
 {
-  "version": "0.4.0",
-  "description": "Sign transaction for NEAR Protocol",
+  "version": "0.4.2",
+  "description": "Sign transaction for NEAR Protocol. Created by BANYAN and HERE Wallet",
   "proposedName": "NEAR Protocol Snap",
   "repository": {
     "type": "git",
     "url": "https://github.com/here-wallet/near-snap.git"
   },
   "source": {
-    "shasum": "qvCZAtBzu2Sr4+V9GUcfzuVcKmCQpLqUG+gEIZpMUqU=",
+    "shasum": "zFddKle4YFL9e7XLNt1Xibt0L/GIr8KlGzjM/bTNXWI=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
