@@ -57,9 +57,9 @@ export async function needActivate(params: {
   const account = await getSigner(snap, params.network);
   const view = panel([
     heading(t('needActivation.title')),
-    text(t('needActivate.text', params.network)),
+    text(t('needActivation.text', params.network)),
     copyable(account.accountId),
-    text(t('needActivate.info')),
+    text(t('needActivation.info')),
   ]);
 
   await snap.request({

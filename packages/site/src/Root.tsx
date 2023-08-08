@@ -1,5 +1,8 @@
 import React, { createContext, useState } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 // eslint-disable-next-line import/no-unassigned-import
 import './buffer';
 
@@ -36,6 +39,7 @@ export const Root = () => {
     <ToggleThemeContext.Provider value={toggleTheme}>
       <ThemeProvider theme={darkTheme ? dark : light}>
         <MetaMaskProvider>
+          <ToastContainer />
           <GlobalStyle />
           <Wrapper>
             <Header />

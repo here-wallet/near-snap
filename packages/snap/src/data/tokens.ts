@@ -1,4 +1,4 @@
-export const tokens = {
+export const tokens: Record<string, { decimal: string; ticker: string }> = {
   usn: { decimal: '18', ticker: 'USN' },
   'ft.zomland.near': { decimal: '24', ticker: 'ZML' },
   'lockedjumptoken.jumpfinance.near': { decimal: '18', ticker: 'LJUMP' },
@@ -149,7 +149,6 @@ export const tokens = {
     decimal: '18',
     ticker: 'LINK',
   },
-  '': {},
   'c944e90c64b2c07662a292be6244bdf05cda44a7.factory.bridge.near': {
     decimal: '18',
     ticker: 'GRT',

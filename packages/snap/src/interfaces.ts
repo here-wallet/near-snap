@@ -33,12 +33,14 @@ export type SignMessageParams = {
 
 export type SignDelegatedTransactionParams = {
   network: NearNetwork;
+  hintBalance?: string;
   delegateAction: DelegateJson;
   payer?: string;
 };
 
 export type SignTransactionsParams = {
   transactions: TransactionJson[];
+  hintBalance?: string;
   network: NearNetwork;
 };
 

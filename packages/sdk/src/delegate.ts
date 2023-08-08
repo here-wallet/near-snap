@@ -15,9 +15,7 @@ export type DelegateProvderProtocol = {
 
 export class DelegateNotAllowed extends Error {}
 
-export class DelegateRequestError extends Error {
-  //
-}
+export class DelegateRequestError extends Error {}
 
 export class HEREDelegateProvider implements DelegateProvderProtocol {
   endpoint = 'https://api.herewallet.app/api/v1';
@@ -52,6 +50,10 @@ export class HEREDelegateProvider implements DelegateProvderProtocol {
       body: JSON.stringify({ transaction: trxBase64 }),
       method: 'POST',
     });
+
+    if (!response.ok) {
+      throw new DelegateRequestError(await response.text());
+    }
 
     const { allowed } = await response.json();
     return allowed;

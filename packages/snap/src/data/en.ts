@@ -12,7 +12,7 @@ export const locales = {
     header: 'Sign Message',
     site: 'Site **${0}**',
     recipient: 'Recipient:',
-    account: 'Sign message with ${0} account: ',
+    account: 'Sign message with **${0}** account: ',
     msgToBeSigned: 'Message to be signed:',
   },
 
@@ -33,16 +33,17 @@ export const locales = {
     allowAllMethods:
       '_You authorize the contract_ **${0}** _to call_ **all not payable methods**',
     askingPublicData: 'Asking for your public data:',
-    yourTypeAddress: 'Your ${0} address:',
+    yourTypeAddress: 'Your **${0}** address:',
     yourPublicKey: 'Your public key:',
   },
 
   viewDelegate: {
     header: 'Sign Transaction',
     accessDenied: 'Access is denied',
+    balance: 'Account balance: **${0}**',
     site: 'Site **${0}**',
-    yourAccount: 'Your account: ${0} **${1}**',
-    receiver: 'Receiver: **${0}**',
+    yourAccount: 'Your **${0}** account:',
+    receiver: 'Receiver:',
     gasFree: 'GAS Free:',
     gasFreeText: 'The commission of this transaction will be paid by **${0}**.',
   },
@@ -50,13 +51,16 @@ export const locales = {
   viewTransactions: {
     site: 'Site **${0}**',
     header: 'Sign Transaction (${0}/${1})',
-    yourAccount: 'Your account: ${0} **${1}**',
-    receiver: 'Receiver: **${0}**',
+    yourAccount: 'Your **${0}** account:',
+    balance: 'Account balance: **${0}**',
+    receiver: 'Receiver:',
     gasFree: 'GAS Free:',
     gasFreeText: 'The commission of this transaction will be paid by **${0}**.',
   },
 
   FunctionCall: {
+    ftTransfer: 'Transfer ${0}',
+    ftAmount: 'Amount: **${0} ${1}**',
     method: 'Method: **${0}**',
     deposit: 'Deposit: **${0}**',
     gas: 'Gas: **${0}** TGas',
@@ -75,7 +79,7 @@ export const locales = {
     fullAccess:
       '**WARNING! With this key you give access to all your NEAR account assets.**',
     key: 'Public key:',
-    receiver: 'Receiver: **${0}**',
+    receiver: 'Receiver:',
     allowance: 'Allowance: **${0}**',
     methods: 'Methods: **${0}**',
   },

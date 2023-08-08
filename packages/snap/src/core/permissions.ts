@@ -57,8 +57,6 @@ export async function disconnectApp(params: PermissionsPath) {
 export async function connectApp(params: ConnectOptions) {
   const account = await getSigner(snap, params.network);
   const publicKey = account.publicKey.toString();
-
-  const type = params.network === 'testnet' ? '**testnet**' : '';
   const view = panel([text(t('connectApp.site', params.origin))]);
 
   if (params.contractId) {
@@ -76,7 +74,7 @@ export async function connectApp(params: ConnectOptions) {
 
   view.children.push(
     heading(t('connectApp.askingPublicData')),
-    text(t('connectApp.yourTypeAddress', type)),
+    text(t('connectApp.yourTypeAddress', params.network)),
     copyable(account.accountId),
     text(t('connectApp.yourPublicKey')),
     copyable(publicKey),

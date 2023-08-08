@@ -1,6 +1,6 @@
-/* eslint-disable no-alert */
 import { useContext, useEffect, useState } from 'react';
 import { NearSnapStatus } from '@near-snap/sdk';
+import { toast } from 'react-toastify';
 
 import { MetaMaskContext } from './metamask';
 import {
@@ -16,9 +16,11 @@ import {
   Button,
 } from './components';
 
+export const TGAS = Math.pow(10, 12);
+
 const Index = () => {
   const context = useContext(MetaMaskContext);
-  const { installSnap, connectWallet, disconnectWallet, setError } = context;
+  const { installSnap, connectWallet, disconnectWallet } = context;
   const { error, status, snap, account } = context;
   const [messages, setMessages] = useState<any[]>([]);
   const [value, setValue] = useState('');
@@ -41,26 +43,53 @@ const Index = () => {
     try {
       const signed = await account?.authenticate('Near Snap', value);
       setValue('');
-      alert(`Signed by ${signed?.accountId}`);
+      toast(`Signed by ${signed?.accountId}`);
     } catch (e) {
-      alert(e);
+      toast(JSON.stringify(e));
     }
   };
 
   const sendMessage = async () => {
-    try {
-      await account?.functionCall({
-        contractId,
-        methodName: 'sendMessage',
-        args: { text: value },
-      });
+    const executing = account?.executeTransaction({
+      receiverId: contractId,
+      actions: [
+        {
+          type: 'FunctionCall',
+          params: {
+            methodName: 'addMessage',
+            args: { text: value },
+            gas: String(30 * TGAS),
+            deposit: '0',
+          },
+        },
+      ],
+    });
 
-      setMessages((t) => [...t, { sender: account?.accountId, text: value }]);
-      setValue('');
-    } catch (e) {
-      console.error(e);
-      setError(e);
+    if (!executing) {
+      return;
     }
+
+    toast.promise(executing, {
+      pending: 'Transaction is pending',
+      error: {
+        pauseOnHover: true,
+        render({ data }: any) {
+          try {
+            return JSON.stringify(data);
+          } catch {
+            return 'Failed!';
+          }
+        },
+      },
+      success: {
+        render() {
+          const msg = { sender: account?.accountId, text: value };
+          setMessages((t) => [...t, msg]);
+          setValue('');
+          return 'Success!';
+        },
+      },
+    });
   };
 
   if (status === null) {
@@ -210,12 +239,16 @@ const Index = () => {
             </div>
 
             <CardContainer>
-              {messages.map((msg) => (
-                <Card
-                  style={{ flex: 1, gap: 8 }}
-                  content={{ title: msg.sender, description: msg.text }}
-                />
-              ))}
+              {messages
+                .map((m, index) => ({ ...m, index }))
+                .reverse()
+                .map((msg) => (
+                  <Card
+                    key={msg.index}
+                    style={{ flex: 1, gap: 8 }}
+                    content={{ title: msg.sender, description: msg.text }}
+                  />
+                ))}
             </CardContainer>
           </div>
         )}

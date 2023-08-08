@@ -21,13 +21,15 @@ export async function signDelegatedTransaction(
   snap: SnapsGlobalObject,
   params: SignDelegatedTransactionParams,
 ) {
-  const { delegateAction: action, payer, network } = params;
+  const { delegateAction: action, payer, network, hintBalance } = params;
   const { signer, accountId } = await getSigner(snap, network);
 
-  const dialogs = viewDelegate({ origin, action, accountId, network, payer });
+  const args = { origin, action, accountId, network, payer, hintBalance };
+  const dialogs = viewDelegate(args);
+
   const confirmation = await snap.request({
-    method: 'snap_dialog',
     params: { type: 'confirmation', content: dialogs },
+    method: 'snap_dialog',
   });
 
   if (!confirmation) {
@@ -89,7 +91,7 @@ export async function signTransactions(
   params: SignTransactionsParams,
 ): Promise<([string, string] | null)[]> {
   const signedTransactions: ([string, string] | null)[] = [];
-  const { transactions: trxs, network } = params;
+  const { transactions: trxs, network, hintBalance } = params;
   const { signer, publicKey, accountId } = await getSigner(snap, network);
 
   if (trxs.length === 1 && trxs[0].actions.length === 1) {
@@ -120,7 +122,13 @@ export async function signTransactions(
   }
 
   let index = 0;
-  const dialogs = viewTransactions(origin, trxs, accountId, network);
+  const dialogs = viewTransactions(
+    origin,
+    trxs,
+    accountId,
+    network,
+    hintBalance,
+  );
 
   for (const tx of trxs) {
     const confirmation = await snap.request({

@@ -2,6 +2,7 @@ import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui';
 import { formatNearAmount } from 'near-api-js/lib/utils/format';
 import { Action } from '@near-wallet-selector/core';
 import { DelegateJson, TransactionJson } from '../interfaces';
+import { tokens } from '../data/tokens';
 import { t } from './locales';
 
 export const TGAS = Math.pow(10, 12);
@@ -14,44 +15,70 @@ const formatAmount = (amount: string) => {
   return `${near} NEAR`;
 };
 
-const formatAddress = (addr: string) => {
-  if (addr.endsWith('.near') && addr.length > 22) {
-    return `${addr.slice(0, 9)}..${addr.slice(-10)}`;
+export const toReadableNumber = (number = '0', decimals?: number): string => {
+  if (!decimals) {
+    return number;
   }
 
-  if (addr.length > 18) {
-    return `${addr.slice(0, 8)}..${addr.slice(-8)}`;
-  }
+  const wholeStr = number.substring(0, number.length - decimals) || '0';
+  const fractionStr = number
+    .substring(number.length - decimals)
+    .padStart(decimals, '0')
+    .substring(0, decimals);
 
-  return addr;
+  return `${wholeStr}.${fractionStr}`.replace(/\.?0+$/u, '');
 };
 
-export const viewAction = (action: Action) => {
+export const viewAction = (receiver: string, action: Action) => {
   const view = panel([]);
   view.children.push(divider());
-  view.children.push(heading(action.type));
 
   switch (action.type) {
     case 'FunctionCall': {
+      const argsCopy = copyable(JSON.stringify(action.params.args, null, 2));
       const gas = Math.round(Number(action.params.gas) / TGAS);
+      const methods = ['ft_transfer', 'ft_transfer_call'];
+
+      if (methods.includes(action.params.methodName) && tokens[receiver]) {
+        const ft = tokens[receiver];
+        const { amount } = action.params.args as any;
+        const readableAmount = toReadableNumber(amount, Number(ft.decimal));
+
+        view.children.push(
+          heading(t('FunctionCall.ftTransfer', ft.ticker)),
+          text(t('FunctionCall.ftAmount', readableAmount, ft.ticker)),
+          text(t('FunctionCall.method', action.params.methodName)),
+          text(t('FunctionCall.deposit', formatAmount(action.params.deposit))),
+          text(t('FunctionCall.gas', gas)),
+          text(t('FunctionCall.args')),
+          argsCopy,
+        );
+        return view;
+      }
+
       view.children.push(
+        heading(action.type),
         text(t('FunctionCall.method', action.params.methodName)),
         text(t('FunctionCall.deposit', formatAmount(action.params.deposit))),
         text(t('FunctionCall.gas', gas)),
         text(t('FunctionCall.args')),
-        copyable(JSON.stringify(action.params.args, null, 2)),
+        argsCopy,
       );
       return view;
     }
 
     case 'Transfer': {
       const deposit = formatAmount(action.params.deposit);
-      view.children.push(text(t('Transfer.deposit'), deposit));
+      view.children.push(
+        heading(action.type),
+        text(t('Transfer.deposit'), deposit),
+      );
       return view;
     }
 
     case 'DeleteKey': {
       view.children.push(
+        heading(action.type),
         text(t('DeleteKey.key')),
         copyable(action.params.publicKey),
       );
@@ -61,6 +88,7 @@ export const viewAction = (action: Action) => {
     case 'AddKey': {
       if (action.params.accessKey.permission === 'FullAccess') {
         view.children.push(
+          heading(action.type),
           text(t('AddKey.fullAccess')),
           text(t('AddKey.key')),
           copyable(action.params.publicKey),
@@ -72,7 +100,12 @@ export const viewAction = (action: Action) => {
       const { allowance, receiverId, methodNames } =
         action.params.accessKey.permission;
 
-      view.children.push(text(t('AddKey.receiver', formatAddress(receiverId))));
+      view.children.push(
+        heading(action.type),
+        text(t('AddKey.receiver')),
+        copyable(receiverId),
+      );
+
       if (allowance !== undefined) {
         const value = formatAmount(allowance);
         view.children.push(text(t('AddKey.allowance', value)));
@@ -91,7 +124,7 @@ export const viewAction = (action: Action) => {
     }
 
     default:
-      view.children.push(text(JSON.stringify(action)));
+      view.children.push(heading(action.type), text(JSON.stringify(action)));
       return view;
   }
 };
@@ -102,26 +135,25 @@ export const viewDelegate = (data: {
   accountId: string;
   network: string;
   payer?: string;
+  hintBalance?: string;
 }) => {
-  const view = panel([]);
-  const { accountId, origin, payer, action } = data;
-  const account = formatAddress(accountId);
-  const receiver = formatAddress(action.receiverId);
-  const type = data.network === 'testnet' ? '**[testnet]**' : '';
+  const { hintBalance, accountId, origin, payer, action } = data;
 
-  view.children.push(heading(t('viewDelegate.header')));
-  view.children.push(text(t('viewDelegate.site', origin)));
-  view.children.push(text(t('viewDelegate.yourAccount', type, account)));
-  view.children.push(text(t('viewDelegate.receiver', receiver)));
-
-  view.children.push(
+  return panel([
+    heading(t('viewDelegate.header')),
+    text(t('viewDelegate.site', origin)),
+    hintBalance
+      ? text(t('viewDelegate.balance', formatAmount(hintBalance)))
+      : text(''),
+    text(t('viewDelegate.yourAccount', data.network)),
+    copyable(accountId),
+    text(t('viewDelegate.receiver')),
+    copyable(action.receiverId),
     divider(),
     heading(t('viewDelegate.gasFree')),
     text(t('viewDelegate.gasFreeText', payer ?? 'another account')),
-  );
-
-  view.children.push(...data.action.actions.map(viewAction));
-  return view;
+    ...data.action.actions.map((act) => viewAction(action.receiverId, act)),
+  ]);
 };
 
 export const viewTransactions = (
@@ -129,21 +161,23 @@ export const viewTransactions = (
   txArray: TransactionJson[],
   accountId: string,
   network: string,
+  hintBalance?: string,
 ) => {
   return txArray.map((tx, index) => {
-    const view = panel([]);
     const header = t('viewTransactions.header', index + 1, txArray.length);
-    const account = formatAddress(accountId);
-    const reciver = formatAddress(tx.receiverId);
-    const type = network === 'testnet' ? '**[testnet]**' : '';
 
-    view.children.push(heading(header));
-    view.children.push(text(t('viewDelegate.site', origin)));
-    view.children.push(text(t('viewDelegate.yourAccount', type, account)));
-    view.children.push(text(t('viewDelegate.receiver', reciver)));
-
-    view.children.push(text(''));
-    view.children.push(...tx.actions.map(viewAction));
-    return view;
+    return panel([
+      heading(header),
+      text(t('viewTransactions.site', origin)),
+      hintBalance
+        ? text(t('viewTransactions.balance', formatAmount(hintBalance)))
+        : text(''),
+      text(t('viewTransactions.yourAccount', network)),
+      copyable(accountId),
+      text(t('viewTransactions.receiver')),
+      copyable(tx.receiverId),
+      text(''),
+      ...tx.actions.map((act) => viewAction(tx.receiverId, act)),
+    ]);
   });
 };

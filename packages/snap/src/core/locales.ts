@@ -7,6 +7,10 @@ export const t = (key: string, ...args: any[]) => {
     locales,
   );
 
+  if (!txt) {
+    return key;
+  }
+
   return txt.replaceAll(
     /\$\{(\d+)\}/gu,
     (_: any, i: number) => args[Number(i)],

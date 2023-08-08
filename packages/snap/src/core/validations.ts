@@ -48,12 +48,14 @@ const delegateAction: Describe<DelegateJson> = object({
 
 export const signTransactionsSchema: Describe<SignTransactionsParams> = object({
   network: networkSchema,
+  hintBalance: optional(string()),
   transactions: array(transaction),
 });
 
 export const signDelegateSchema: Describe<SignDelegatedTransactionParams> =
   object({
     delegateAction,
+    hintBalance: optional(string()),
     network: networkSchema,
     payer: optional(string()),
   });

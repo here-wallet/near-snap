@@ -58,13 +58,13 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       await disconnectApp({ origin, snap, ...request.params });
       return true;
 
-    case Methods.SignDelegate:
-      assert(request.params, signDelegateSchema);
-      return await signDelegatedTransaction(origin, snap, request.params);
-
     case Methods.SignMessage:
       assert(request.params, signMessageSchema);
       return await signMessage(snap, origin, request.params);
+
+    case Methods.SignDelegate:
+      assert(request.params, signDelegateSchema);
+      return await signDelegatedTransaction(origin, snap, request.params);
 
     case Methods.SignTransaction:
       assert(request.params, signTransactionsSchema);

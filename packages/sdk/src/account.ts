@@ -137,8 +137,10 @@ class NearSnapAccount extends Account {
     actions: transactions.Action[],
   ): Promise<[Uint8Array, SignedTransaction]> {
     const access = await this.getLastNonce();
+    const { total } = await this.getAccountBalance();
     const result = await this.snap.signTransactions({
       network: this.connection.networkId as NetworkId,
+      hintBalance: total,
       transactions: [
         {
           recentBlockHash: access.block_hash,
@@ -210,8 +212,10 @@ class NearSnapAccount extends Account {
       actions,
     });
 
+    const { total } = await this.getAccountBalance();
     const data = await this.snap.signDelegatedTransactions({
       payer,
+      hintBalance: total,
       network: this.connection.networkId as NetworkId,
       delegateAction: {
         maxBlockHeight: action.maxBlockHeight.toString(),
@@ -324,7 +328,9 @@ class NearSnapAccount extends Account {
     trans: Omit<Transaction, 'signerId'>[],
   ): Promise<FinalExecutionOutcome[]> {
     const access = await this.getLastNonce();
+    const { total } = await this.getAccountBalance();
     const signedList = await this.snap.signTransactions({
+      hintBalance: total,
       network: this.connection.networkId as NetworkId,
       transactions: trans.map((tx, i) => ({
         nonce: new BN(access.nonce).iaddn(i + 1).toNumber(),

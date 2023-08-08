@@ -33,6 +33,7 @@ export type DelegatedTransaction = {
 
 export type SignTransactionsParams = {
   transactions: TransactionJson[];
+  hintBalance: string;
   network: NetworkId;
 };
 
@@ -46,6 +47,7 @@ export type SignMessageParams = {
 export type SignDelegatedTransactionsParams = {
   payer?: string;
   network: NetworkId;
+  hintBalance?: string;
   delegateAction: {
     maxBlockHeight: string;
     actions: Action[];

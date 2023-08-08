@@ -70,7 +70,6 @@ export const signMessage = async (
   }
 
   const { signer, accountId } = await getSigner(snap, network);
-  const type = network === 'testnet' ? '**testnet**' : '';
   const confirmation = await snap.request({
     method: 'snap_dialog',
     params: {
@@ -79,7 +78,7 @@ export const signMessage = async (
         heading(t('signMessage.header')),
         text(t('signMessage.site', origin)),
 
-        text(t('signMessage.account', type)),
+        text(t('signMessage.account', network)),
         copyable(accountId),
 
         text(t('signMessage.recipient')),
