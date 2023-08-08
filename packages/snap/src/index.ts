@@ -4,6 +4,7 @@ import { assert } from 'superstruct';
 import {
   connectWalletSchema,
   signDelegateSchema,
+  signMessageSchema,
   signTransactionsSchema,
   validAccountSchema,
 } from './core/validations';
@@ -13,6 +14,7 @@ import {
 } from './core/signTransactions';
 import { getAccount, needActivate } from './core/getAccount';
 import { connectApp, disconnectApp, getPermissions } from './core/permissions';
+import { signMessage } from './core/signMessage';
 
 enum Methods {
   NeedActivate = 'near_needActivate',
@@ -22,6 +24,7 @@ enum Methods {
   GetPermissions = 'near_getPermissions',
   SignTransaction = 'near_signTransactions',
   SignDelegate = 'near_signDelegate',
+  SignMessage = 'near_signMessage',
 }
 
 export const onRpcRequest: OnRpcRequestHandler = async ({
@@ -58,6 +61,10 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
     case Methods.SignDelegate:
       assert(request.params, signDelegateSchema);
       return await signDelegatedTransaction(origin, snap, request.params);
+
+    case Methods.SignMessage:
+      assert(request.params, signMessageSchema);
+      return await signMessage(snap, origin, request.params);
 
     case Methods.SignTransaction:
       assert(request.params, signTransactionsSchema);

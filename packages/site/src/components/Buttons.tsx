@@ -89,9 +89,7 @@ export const MetamaskButton = (
   );
 };
 
-export const Button = (
-  props: ComponentProps<typeof SButton> & { children: string },
-) => {
+export const Button = (props: ComponentProps<typeof SButton>) => {
   return <SButton {...props}>{props.children}</SButton>;
 };
 

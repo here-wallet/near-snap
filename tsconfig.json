@@ -3,6 +3,7 @@
     "declaration": true,
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
     "module": "CommonJS",
     "moduleResolution": "node",
     "useUnknownInCatchVariables": false,

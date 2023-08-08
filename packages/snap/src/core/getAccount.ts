@@ -9,6 +9,7 @@ import bs58 from 'bs58';
 
 import { NearNetwork } from '../interfaces';
 import { getPermissions } from './permissions';
+import { t } from './locales';
 
 const nearNetwork = {
   mainnet: 397,
@@ -28,7 +29,7 @@ export async function getKeyPair(
   })) as JsonBIP44Node;
 
   if (node.privateKey === undefined) {
-    throw Error('Private key is not defined');
+    throw Error(t('getKeyPair.privateNotDefined'));
   }
 
   const buf = Buffer.from(node.privateKey.substring(2), 'hex');
@@ -55,24 +56,15 @@ export async function needActivate(params: {
 }) {
   const account = await getSigner(snap, params.network);
   const view = panel([
-    heading('You need to activate your account.'),
-    text(
-      `**Send 0.1 NEAR** to **your ${params.network} address** to have your account appear on the blockchain.`,
-    ),
-
+    heading(t('needActivation.title')),
+    text(t('needActivate.text', params.network)),
     copyable(account.accountId),
-
-    text(
-      `**Without this, you won't be able to use dApps.** After sending, make sure that your balance has replenished.`,
-    ),
+    text(t('needActivate.info')),
   ]);
 
   await snap.request({
     method: 'snap_dialog',
-    params: {
-      type: 'alert',
-      content: view,
-    },
+    params: { type: 'alert', content: view },
   });
 }
 
@@ -86,7 +78,7 @@ export async function getAccount(
   const publicKey = account.publicKey.toString();
 
   if (!permissions) {
-    throw Error('Access is denied. Call near_connect first');
+    throw Error(t('getAccount.accessDenied'));
   }
 
   return { publicKey, accountId: account.accountId, permissions };

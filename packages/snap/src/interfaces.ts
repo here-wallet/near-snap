@@ -24,6 +24,13 @@ export type DelegateJson = {
   senderId: string;
 };
 
+export type SignMessageParams = {
+  network: NearNetwork;
+  message: string;
+  recipient: string;
+  nonce: number[];
+};
+
 export type SignDelegatedTransactionParams = {
   network: NearNetwork;
   delegateAction: DelegateJson;

@@ -36,6 +36,13 @@ export type SignTransactionsParams = {
   network: NetworkId;
 };
 
+export type SignMessageParams = {
+  network: NetworkId;
+  message: string;
+  recipient: string;
+  nonce: number[];
+};
+
 export type SignDelegatedTransactionsParams = {
   payer?: string;
   network: NetworkId;

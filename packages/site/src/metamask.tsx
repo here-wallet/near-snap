@@ -9,7 +9,7 @@ import { NearSnap, NearSnapAccount, NearSnapStatus } from '@near-snap/sdk';
 
 export type MetamaskState = {
   installSnap: () => void;
-  connectWallet: () => void;
+  connectWallet: (network: 'mainnet' | 'testnet') => void;
   disconnectWallet: () => void;
   setError: (_: Error) => void;
   status: NearSnapStatus | null;
@@ -64,13 +64,9 @@ export const MetaMaskProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const connectWallet = useCallback(async () => {
+  const connectWallet = useCallback(async (network: 'mainnet' | 'testnet') => {
     try {
-      const snapAccount = await NearSnapAccount.connect({
-        network: 'mainnet',
-        snap,
-      });
-
+      const snapAccount = await NearSnapAccount.connect({ network, snap });
       setAccount(snapAccount);
     } catch (e) {
       console.log(e);

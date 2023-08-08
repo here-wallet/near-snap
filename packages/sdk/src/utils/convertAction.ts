@@ -1,6 +1,8 @@
 import { transactions } from 'near-api-js';
 import type { Action } from '@near-wallet-selector/core';
 
+export const TGAS = Math.pow(10, 12);
+
 // Decode binary to json or array
 const decodeArgs = (args: Uint8Array) => {
   try {
@@ -71,9 +73,9 @@ export const convertAction = (action: transactions.Action): Action => {
       type: 'FunctionCall',
       params: {
         args: decodeArgs(action.functionCall.args),
-        deposit: action.functionCall.deposit.toString(),
-        gas: action.functionCall.gas.toString(),
-        methodName: action.functionCall.methodName,
+        deposit: action.functionCall.deposit?.toString() ?? '0',
+        gas: action.functionCall.gas?.toString() ?? String(300 * TGAS),
+        methodName: action.functionCall.methodName ?? '',
       },
     };
   }

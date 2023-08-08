@@ -5,7 +5,9 @@ import {
   Maybe,
   NearSnapStatus,
   SignDelegatedTransactionsParams,
+  SignMessageParams,
 } from './types';
+import { SignedMessageNEP0413 } from './utils/nep0413';
 
 class NearSnap {
   readonly id: string;
@@ -65,6 +67,12 @@ class NearSnap {
     return await this.provider.invokeSnap(this.id, 'near_needActivate', {
       network,
     });
+  }
+
+  async signMessage(
+    data: SignMessageParams,
+  ): Promise<Maybe<SignedMessageNEP0413>> {
+    return await this.provider.invokeSnap(this.id, 'near_signMessage', data);
   }
 
   async signDelegatedTransactions(

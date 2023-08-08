@@ -2,6 +2,7 @@ import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui';
 import { NetworkId } from '@near-wallet-selector/core';
 import { getSigner } from './getAccount';
+import { t } from './locales';
 
 type PermissionsPath = {
   network: NetworkId;
@@ -58,15 +59,15 @@ export async function connectApp(params: ConnectOptions) {
   const publicKey = account.publicKey.toString();
 
   const type = params.network === 'testnet' ? '**testnet**' : '';
-  const view = panel([text(`Site **${params.origin}**`)]);
+  const view = panel([text(t('connectApp.site', params.origin))]);
 
   if (params.contractId) {
     const allowMethodsText = params.methods
-      ? `_You authorize the contract_ **${params.contractId}** _to call the following_ **not payable** _methods:_`
-      : `_You authorize the contract_ **${params.contractId}** _to call_ **all not payable methods**`;
+      ? t('connectApp.allowMethods', params.contractId)
+      : t('connectApp.allowAllMethods', params.contractId);
 
     view.children.push(
-      heading('Asks for permission to connect:'),
+      heading(t('connectApp.header')),
       text(allowMethodsText),
       text(params.methods?.join(', ') ?? ''),
       divider(),
@@ -74,23 +75,20 @@ export async function connectApp(params: ConnectOptions) {
   }
 
   view.children.push(
-    heading('Asking for your public data:'),
-    text(`Your ${type} address:`),
+    heading(t('connectApp.askingPublicData')),
+    text(t('connectApp.yourTypeAddress', type)),
     copyable(account.accountId),
-    text('Your public key:'),
+    text(t('connectApp.yourPublicKey')),
     copyable(publicKey),
   );
 
   const isConfirmed = await snap.request({
     method: 'snap_dialog',
-    params: {
-      type: 'confirmation',
-      content: view,
-    },
+    params: { type: 'confirmation', content: view },
   });
 
   if (!isConfirmed) {
-    throw Error('Access is denied');
+    throw Error(t('connectApp.accessDenied'));
   }
 
   let data: any = await snap.request({

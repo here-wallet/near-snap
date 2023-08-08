@@ -1,6 +1,5 @@
-import { useContext } from 'react';
-import { KeyPairEd25519 } from '@near-js/crypto/lib/key_pair_ed25519';
-import { AddKeyAction } from '@near-wallet-selector/core';
+/* eslint-disable no-alert */
+import { useContext, useEffect, useState } from 'react';
 import { NearSnapStatus } from '@near-snap/sdk';
 
 import { MetaMaskContext } from './metamask';
@@ -21,24 +20,43 @@ const Index = () => {
   const context = useContext(MetaMaskContext);
   const { installSnap, connectWallet, disconnectWallet, setError } = context;
   const { error, status, snap, account } = context;
+  const [messages, setMessages] = useState<any[]>([]);
+  const [value, setValue] = useState('');
 
-  const handleSignTransactionClick = async () => {
+  const swithTo = account?.network === 'mainnet' ? 'testnet' : 'mainnet';
+  const contractId =
+    account?.network === 'mainnet' ? 'guest-book.near' : 'guest-book.testnet';
+
+  useEffect(() => {
+    if (!account) {
+      return;
+    }
+
+    account
+      .viewFunction({ contractId, methodName: 'getMessages' })
+      .then(setMessages);
+  }, [account]);
+
+  const signMessage = async () => {
     try {
-      const keyPair = KeyPairEd25519.fromRandom();
-      const addKey: AddKeyAction = {
-        type: 'AddKey',
-        params: {
-          publicKey: keyPair.publicKey.toString(),
-          accessKey: {
-            permission: { receiverId: 'storage.herewallet.near' },
-          },
-        },
-      };
+      const signed = await account?.authenticate('Near Snap', value);
+      setValue('');
+      alert(`Signed by ${signed?.accountId}`);
+    } catch (e) {
+      alert(e);
+    }
+  };
 
-      await account?.executeTransaction({
-        receiverId: account.accountId,
-        actions: [addKey],
+  const sendMessage = async () => {
+    try {
+      await account?.functionCall({
+        contractId,
+        methodName: 'sendMessage',
+        args: { text: value },
       });
+
+      setMessages((t) => [...t, { sender: account?.accountId, text: value }]);
+      setValue('');
     } catch (e) {
       console.error(e);
       setError(e);
@@ -69,7 +87,8 @@ const Index = () => {
         Welcome to <Span>near-snap</Span>
       </Heading>
       <Subtitle>Interact with NEAR Protocol in your Metamask easy</Subtitle>
-      <CardContainer>
+
+      <CardContainer style={{ marginTop: 32 }}>
         {error && (
           <ErrorMessage>
             <b>An error happened:</b> {error.message}
@@ -122,44 +141,84 @@ const Index = () => {
               title: 'Connect wallet',
               description:
                 'Display a NEAR Protocol address within a confirmation screen in MetaMask.',
-              button: <Button onClick={connectWallet}>Connect</Button>,
+              button: (
+                <div style={{ display: 'flex', gap: 16, marginTop: 'auto' }}>
+                  <Button
+                    style={{ flex: 1 }}
+                    onClick={() => connectWallet('mainnet')}
+                  >
+                    Mainnet
+                  </Button>
+                  <Button
+                    style={{ flex: 1 }}
+                    onClick={() => connectWallet('testnet')}
+                  >
+                    Testnet
+                  </Button>
+                </div>
+              ),
             }}
           />
         )}
 
-        {account !== null && (
-          <Card
-            content={{
-              title: 'Hello',
-              description: account.accountId,
-              button: <Button onClick={disconnectWallet}>Disconnect</Button>,
-            }}
-          />
+        {account && (
+          <>
+            <Card
+              content={{
+                title: 'Hello',
+                description: account.accountId,
+                button: <Button onClick={disconnectWallet}>Disconnect</Button>,
+              }}
+            />
+            <Card
+              content={{
+                title: 'Switch network',
+                description: 'Near Snap support mainnet and testnet, try both!',
+                button: (
+                  <Button onClick={() => connectWallet(swithTo)}>
+                    To {swithTo}
+                  </Button>
+                ),
+              }}
+            />
+          </>
         )}
 
-        <Card
-          disabled={!account}
-          content={{
-            title: 'Sign transaction',
-            description:
-              'Sign a NEAR Protocol transaction within a confirmation screen in MetaMask.',
-            button: (
-              <Button onClick={handleSignTransactionClick} disabled={!account}>
-                Sign transaction
+        {account && (
+          <div style={{ marginTop: 32 }}>
+            <Heading>Guest book</Heading>
+            <div
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                width: '100%',
+                gap: 8,
+              }}
+            >
+              <input
+                value={value}
+                style={{ flex: 1 }}
+                onChange={(e) => setValue(e.target.value)}
+              />
+
+              <Button style={{ width: 80 }} onClick={sendMessage}>
+                Send
               </Button>
-            ),
-          }}
-        />
+              <Button style={{ width: 80 }} onClick={signMessage}>
+                Sign
+              </Button>
+            </div>
 
-        <Card
-          disabled
-          content={{
-            title: 'Sign message',
-            description:
-              'Sign a NEAR Protocol message within a confirmation screen in MetaMask.',
-            button: <Button disabled>Sign message</Button>,
-          }}
-        />
+            <CardContainer>
+              {messages.map((msg) => (
+                <Card
+                  style={{ flex: 1, gap: 8 }}
+                  content={{ title: msg.sender, description: msg.text }}
+                />
+              ))}
+            </CardContainer>
+          </div>
+        )}
       </CardContainer>
     </Container>
   );

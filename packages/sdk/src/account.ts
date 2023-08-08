@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import {
   DelegateAction,
   SignedDelegate,
@@ -21,6 +22,7 @@ import { BN } from 'bn.js';
 import { wait, waitTransactionResult } from './utils/waitTransaction';
 import { convertAction } from './utils/convertAction';
 import { createAction } from './utils/createAction';
+import * as nep0413 from './utils/nep0413';
 
 import { TransactionInListError, TransactionSignRejected } from './errors';
 import { DelegatedTransaction, NearSnapStatus } from './types';
@@ -85,8 +87,49 @@ class NearSnapAccount extends Account {
     });
   }
 
-  async signMessage() {
-    // TODO
+  async authenticate(recipient: string, message: string) {
+    const nonce = crypto.randomBytes(32);
+    const request = { message, recipient, nonce, network: this.network };
+    const signed = await this.signMessage(request);
+
+    const isVerified = nep0413.verifySignature(request, signed);
+    if (!isVerified) {
+      throw Error('Signature is incorrect');
+    }
+
+    const keys = await this.getAccessKeys();
+    const isValid = keys.some((k) => {
+      return (
+        k.public_key === signed.publicKey &&
+        k.access_key.permission === 'FullAccess'
+      );
+    });
+
+    if (!isValid) {
+      throw Error('Signer public key is not full access');
+    }
+
+    return signed;
+  }
+
+  async signMessage(data: nep0413.SignMessageOptionsNEP0413) {
+    const signed = await this.snap.signMessage({
+      message: data.message,
+      nonce: Array.from(data.nonce),
+      recipient: data.recipient,
+      network: this.network,
+    });
+
+    if (!signed) {
+      throw Error('Signed result is undefined');
+    }
+
+    const { accountId, publicKey, signature } = signed;
+    if (!accountId || !publicKey || !signature) {
+      throw Error('Signed result is undefined');
+    }
+
+    return { accountId, publicKey, signature };
   }
 
   protected async signTransaction(

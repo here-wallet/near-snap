@@ -2,6 +2,7 @@ import { ReactNode } from 'react';
 import styled from 'styled-components';
 
 type CardProps = {
+  style?: any;
   disabled?: boolean;
   content: {
     title?: string;
@@ -14,22 +15,14 @@ const CardWrapper = styled.div<{ disabled: boolean }>`
   display: flex;
   flex-direction: column;
   background-color: ${({ theme }) => theme.colors.card.default};
-  margin-top: 2.4rem;
-  margin-bottom: 2.4rem;
   overflow-wrap: break-word;
   padding: 2.4rem;
-  width: 250px;
+  gap: 2.4rem;
+  width: calc(50% - 64px);
   border: 1px solid ${({ theme }) => theme.colors.border.default};
   border-radius: ${({ theme }) => theme.radii.default};
   box-shadow: ${({ theme }) => theme.shadows.default};
   filter: opacity(${({ disabled }) => (disabled ? '.4' : '1')});
-  align-self: stretch;
-  ${({ theme }) => theme.mediaQueries.small} {
-    width: 100%;
-    margin-top: 1.2rem;
-    margin-bottom: 1.2rem;
-    padding: 1.6rem;
-  }
 `;
 
 const Title = styled.h2`
@@ -41,15 +34,13 @@ const Title = styled.h2`
 `;
 
 const Description = styled.div`
-  margin-top: 2.4rem;
-  margin-bottom: 2.4rem;
   overflow-wrap: break-word;
 `;
 
-export const Card = ({ content, disabled = false }: CardProps) => {
+export const Card = ({ style, content, disabled = false }: CardProps) => {
   const { title, description, button } = content;
   return (
-    <CardWrapper disabled={disabled}>
+    <CardWrapper style={style} disabled={disabled}>
       {title && <Title>{title}</Title>}
       <Description>{description}</Description>
       {button}

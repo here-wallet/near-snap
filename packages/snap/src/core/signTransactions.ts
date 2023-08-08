@@ -14,6 +14,7 @@ import { createAction } from './createAction';
 import { viewDelegate, viewTransactions } from './viewTransactions';
 import { getPermissions } from './permissions';
 import { getSigner } from './getAccount';
+import { t } from './locales';
 
 export async function signDelegatedTransaction(
   origin: string,
@@ -30,7 +31,7 @@ export async function signDelegatedTransaction(
   });
 
   if (!confirmation) {
-    throw Error('Access denied');
+    throw Error(t('viewDelegate.accessDenied'));
   }
 
   const senderId = action.senderId ?? accountId;

@@ -16,6 +16,7 @@ import {
   TransactionJson,
   DelegateJson,
   SignDelegatedTransactionParams,
+  SignMessageParams,
 } from '../interfaces';
 
 export const networkSchemaDefaulted: Describe<NearNetwork> = defaulted(
@@ -56,6 +57,13 @@ export const signDelegateSchema: Describe<SignDelegatedTransactionParams> =
     network: networkSchema,
     payer: optional(string()),
   });
+
+export const signMessageSchema: Describe<SignMessageParams> = object({
+  message: string(),
+  recipient: string(),
+  nonce: array(number()),
+  network: networkSchema,
+});
 
 export const validAccountSchema: Describe<{ network: NearNetwork }> = object({
   network: networkSchema,
