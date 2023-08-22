@@ -2,7 +2,38 @@
 
 View and sign transactions for NEAR Protocol blockchain.
 
-**Created by BANYAN and HERE Wallet**
+- you can create an account on NEAR Protocol with ed25519 key
+- you can sign transactions on NEAR Protocol
+- FT token transfers and token additions are visualized 
+- you can export keys to a third-party wallet
+- meta-transactions on NEAR Protocol are supported
+
+
+**Add Snap:** https://near-snap.surge.sh
+
+! Metamask doesn't automatically offer to install the new version, you need to do it manually:
+Open metamask -> Settings -> Snaps -> Select Near Snap -> Remove
+
+**Demo (testnet/mainnet):** https://near.github.io/wallet-selector/
+
+### How it works:
+The wallet-selector package uses the @near-snap/sdk library which interacts with near-api-js and the metamask snap rpc.
+
+The @near-snap/plugin itself does not have internet access. The plugin only signs transactions and provides an interface for viewing actions signed by the user.
+
+### Plugin features:
+Limited access to a specific contract.
+Method near_connect(contractId, network, methods) works in the same way as limited keys, that is, they allow you to send free transactions without annoying confirmations.
+
+### Details of what the user is signing.
+List of transaction actions, confirmations of new permissions, additional information. Unfortunately at the moment snap-ui is not very rich, but we are doing our best to make the UI/UX of the plugin better for the user.
+
+### Support for delegated transactions.
+And own infrastructure for new users. HERE Wallet allows metamask users (on the mainnet) to send gas free transactions without having funds on their account.
+
+### Free account activation in mainnet and testnet.
+For users, the HERE Wallet metamask automatically activates accounts so that later it will be possible to use delegated transactions to interact with dApps without having funds on the account. (In the future, we hope to involve the NEAR Foundation in this, as we believe this is an important part of onboarding new users to the network)
+
 
 
 ### Safe and secure. 
