@@ -9,9 +9,7 @@ View and sign transactions for NEAR Protocol blockchain.
 - meta-transactions on NEAR Protocol are supported
 
 
-
-https://github.com/here-wallet/near-snap/assets/41264338/e0c309c4-a569-4836-8d07-30daa40ca9c8
-
+https://github.com/here-wallet/near-snap/assets/41264338/4d2436c0-5952-4963-b78f-dcac7c3990e9
 
 
 **Add Snap:** https://near-snap.surge.sh
