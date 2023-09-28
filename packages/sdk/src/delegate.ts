@@ -23,7 +23,7 @@ export class HEREDelegateProvider implements DelegateProvderProtocol {
   payer = 'HERE Wallet';
 
   async activateAccount(accountId: string, publicKey: string, network: string) {
-    await fetch(`${this.endpoint}/user/create_near_username`, {
+    const response = await fetch(`${this.endpoint}/user/create_near_username`, {
       method: 'POST',
       body: JSON.stringify({
         near_account_id: accountId,
@@ -35,6 +35,10 @@ export class HEREDelegateProvider implements DelegateProvderProtocol {
         Network: network,
       },
     });
+
+    if (!response.ok) {
+      throw new DelegateRequestError(await response.text());
+    }
   }
 
   async isCanDelegate(action: DelegateAction, network = 'mainnet') {

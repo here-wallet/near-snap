@@ -1,18 +1,18 @@
 import { Snap, GetSnapsResponse } from './types';
 
 class NearSnapProvider {
-  async isSnapsAvailable() {
-    try {
-      const provider = window.ethereum;
-      const clientVersion = await provider?.request({
-        method: 'web3_clientVersion',
-      });
+  async isSnapsAvailable(minVersion = 11) {
+    const provider = window.ethereum;
+    const clientVersion = await provider
+      ?.request<string>({ method: 'web3_clientVersion' })
+      .catch(() => null);
 
-      const isFlaskDetected = (clientVersion as string[])?.includes('flask');
-      return Boolean(provider && isFlaskDetected);
-    } catch {
+    if (!(typeof clientVersion === 'string')) {
       return false;
     }
+
+    const version = clientVersion.replace('MetaMask/v', '').split('.')[0];
+    return Number(version) >= minVersion;
   }
 
   async getSnaps(): Promise<GetSnapsResponse> {

@@ -23,6 +23,7 @@ const Index = () => {
   const { installSnap, connectWallet, disconnectWallet } = context;
   const { error, status, snap, account } = context;
   const [messages, setMessages] = useState<any[]>([]);
+  const [isPayable, setPayable] = useState(false);
   const [value, setValue] = useState('');
 
   const swithTo = account?.network === 'mainnet' ? 'testnet' : 'mainnet';
@@ -45,7 +46,7 @@ const Index = () => {
       setValue('');
       toast(`Signed by ${signed?.accountId}`);
     } catch (e) {
-      toast(JSON.stringify(e));
+      toast('Sign error');
     }
   };
 
@@ -59,7 +60,7 @@ const Index = () => {
             methodName: 'addMessage',
             args: { text: value },
             gas: String(30 * TGAS),
-            deposit: '0',
+            deposit: isPayable ? '1' : '0',
           },
         },
       ],
@@ -129,7 +130,7 @@ const Index = () => {
             content={{
               title: 'Install',
               description:
-                'Snaps is pre-release software only available in MetaMask Flask, a canary distribution for developers with access to upcoming features.',
+                'Snaps are already available in the production version of Metamask! Install Metamask to get started',
               button: <InstallFlaskButton />,
             }}
           />
@@ -174,12 +175,14 @@ const Index = () => {
                 <div style={{ display: 'flex', gap: 16, marginTop: 'auto' }}>
                   <Button
                     style={{ flex: 1 }}
+                    disabled={status !== NearSnapStatus.INSTALLED}
                     onClick={() => connectWallet('mainnet')}
                   >
                     Mainnet
                   </Button>
                   <Button
                     style={{ flex: 1 }}
+                    disabled={status !== NearSnapStatus.INSTALLED}
                     onClick={() => connectWallet('testnet')}
                   >
                     Testnet
@@ -229,6 +232,15 @@ const Index = () => {
                 style={{ flex: 1 }}
                 onChange={(e) => setValue(e.target.value)}
               />
+
+              <label>
+                <input
+                  type="checkbox"
+                  checked={isPayable}
+                  onChange={(e) => setPayable(e.target.checked)}
+                />
+                Payable
+              </label>
 
               <Button style={{ width: 80 }} onClick={sendMessage}>
                 Send

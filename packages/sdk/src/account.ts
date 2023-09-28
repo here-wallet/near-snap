@@ -88,6 +88,8 @@ class NearSnapAccount extends Account {
   }
 
   async authenticate(recipient: string, message: string) {
+    await this.activateIfNeeded();
+
     const nonce = crypto.randomBytes(32);
     const request = { message, recipient, nonce, network: this.network };
     const signed = await this.signMessage(request);
@@ -161,24 +163,33 @@ class NearSnapAccount extends Account {
     ];
   }
 
-  async activateIfNeeded() {
-    try {
-      await this.getLastNonce();
-    } catch {
-      if (!this.delegateProvider) {
-        await this.snap.needActivate(this.network);
-        return;
-      }
+  async activateIfNeeded(askCount = 2): Promise<any> {
+    // No need show it infinity, only 2 times
+    if (askCount <= 0) {
+      return null;
+    }
 
+    try {
+      return await this.getLastNonce();
+    } catch (e) {
       try {
-        await this.delegateProvider?.activateAccount(
+        if (!this.delegateProvider) {
+          throw Error();
+        }
+
+        // Try activate account by sponsor
+        await this.delegateProvider.activateAccount(
           this.accountId,
           this.publicKey.toString(),
           this.network,
         );
+
         await wait(1000);
+        return await this.activateIfNeeded(askCount - 1);
       } catch {
         await this.snap.needActivate(this.network);
+        await wait(1000);
+        return await this.activateIfNeeded(askCount - 1);
       }
     }
   }
@@ -284,6 +295,7 @@ class NearSnapAccount extends Account {
       throw new DelegateNotAllowed();
     }
 
+    await this.activateIfNeeded();
     const { action, allowed } = await this.buildDelegateAction(tx);
     if (!allowed) {
       const msg = `Delegated transaction is now allowed by ${this.delegateProvider.payer}. Try other DelegateProvider`;
@@ -327,6 +339,7 @@ class NearSnapAccount extends Account {
   async executeTransactions(
     trans: Omit<Transaction, 'signerId'>[],
   ): Promise<FinalExecutionOutcome[]> {
+    await this.activateIfNeeded();
     const access = await this.getLastNonce();
     const { total } = await this.getAccountBalance();
     const signedList = await this.snap.signTransactions({
@@ -404,7 +417,7 @@ class NearSnapAccount extends Account {
   }) {
     const status = await snap.getStatus();
     if (status === NearSnapStatus.NOT_SUPPORTED) {
-      throw Error('You need install Metamask Flask');
+      throw Error('You need install Metamask no lower than version 11');
     }
 
     if (status === NearSnapStatus.NOT_INSTALLED) {
