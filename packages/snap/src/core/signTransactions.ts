@@ -17,13 +17,15 @@ import { getSigner } from './getAccount';
 import { t } from './locales';
 
 export async function signDelegatedTransaction(
-  origin: string,
-  snap: SnapsGlobalObject,
-  params: SignDelegatedTransactionParams,
+  params: SignDelegatedTransactionParams & {
+    origin: string;
+    snap: SnapsGlobalObject;
+  },
 ) {
-  const { delegateAction: action, payer, network, hintBalance } = params;
+  const { payer, network, hintBalance, snap, origin } = params;
   const { signer, accountId } = await getSigner(snap, network);
 
+  const action = params.delegateAction;
   const args = { origin, action, accountId, network, payer, hintBalance };
   const dialogs = viewDelegate(args);
 
@@ -86,12 +88,10 @@ const signTransaction = async (options: {
 };
 
 export async function signTransactions(
-  origin: string,
-  snap: SnapsGlobalObject,
-  params: SignTransactionsParams,
+  params: SignTransactionsParams & { origin: string; snap: SnapsGlobalObject },
 ): Promise<([string, string] | null)[]> {
   const signedTransactions: ([string, string] | null)[] = [];
-  const { transactions: trxs, network, hintBalance } = params;
+  const { origin, snap, transactions: trxs, network, hintBalance } = params;
   const { signer, publicKey, accountId } = await getSigner(snap, network);
 
   if (trxs.length === 1 && trxs[0].actions.length === 1) {
@@ -99,12 +99,8 @@ export async function signTransactions(
     const { type } = actions[0];
 
     if (type === 'FunctionCall' && actions[0].params.deposit === '0') {
+      const permissions = await getPermissions({ network, origin, snap });
       const { methodName } = actions[0].params;
-      const permissions = await getPermissions({
-        network: params.network,
-        origin,
-        snap,
-      });
 
       const methods = permissions?.[receiverId];
       if (methods && (methods.length === 0 || methods.includes(methodName))) {

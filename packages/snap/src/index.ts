@@ -1,6 +1,9 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
 import { assert } from 'superstruct';
 
+import { connectApp, disconnectApp, getPermissions } from './core/permissions';
+import { getAccount, needActivate } from './core/getAccount';
+import { signMessage } from './core/signMessage';
 import {
   connectWalletSchema,
   signDelegateSchema,
@@ -12,9 +15,6 @@ import {
   signDelegatedTransaction,
   signTransactions,
 } from './core/signTransactions';
-import { getAccount, needActivate } from './core/getAccount';
-import { connectApp, disconnectApp, getPermissions } from './core/permissions';
-import { signMessage } from './core/signMessage';
 
 enum Methods {
   NeedActivate = 'near_needActivate',
@@ -34,7 +34,8 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
   switch (request.method) {
     case Methods.GetAddress: {
       assert(request.params, validAccountSchema);
-      return await getAccount(snap, request.params.network, origin);
+      const { network } = request.params;
+      return await getAccount({ snap, origin, network });
     }
 
     case Methods.NeedActivate: {
@@ -49,26 +50,56 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
       return await getPermissions({ snap, origin, network });
     }
 
-    case Methods.ConnectApp:
+    case Methods.ConnectApp: {
       assert(request.params, connectWalletSchema);
-      return await connectApp({ origin, snap, ...request.params });
+      const { network, contractId, methods } = request.params;
+      return await connectApp({ snap, origin, network, contractId, methods });
+    }
 
-    case Methods.DisconnectApp:
+    case Methods.DisconnectApp: {
       assert(request.params, validAccountSchema);
-      await disconnectApp({ origin, snap, ...request.params });
+      const { network } = request.params;
+      await disconnectApp({ snap, origin, network });
       return true;
+    }
 
-    case Methods.SignMessage:
+    case Methods.SignMessage: {
       assert(request.params, signMessageSchema);
-      return await signMessage(snap, origin, request.params);
+      const { network, message, recipient, nonce } = request.params;
+      return await signMessage({
+        recipient,
+        network,
+        message,
+        origin,
+        nonce,
+        snap,
+      });
+    }
 
-    case Methods.SignDelegate:
+    case Methods.SignDelegate: {
       assert(request.params, signDelegateSchema);
-      return await signDelegatedTransaction(origin, snap, request.params);
+      const { network, hintBalance, delegateAction, payer } = request.params;
+      return await signDelegatedTransaction({
+        delegateAction,
+        hintBalance,
+        network,
+        origin,
+        snap,
+        payer,
+      });
+    }
 
-    case Methods.SignTransaction:
+    case Methods.SignTransaction: {
       assert(request.params, signTransactionsSchema);
-      return await signTransactions(origin, snap, request.params);
+      const { network, hintBalance, transactions } = request.params;
+      return await signTransactions({
+        network,
+        hintBalance,
+        transactions,
+        origin,
+        snap,
+      });
+    }
 
     default:
       throw new Error('Method not found.');

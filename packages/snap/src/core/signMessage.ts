@@ -53,17 +53,15 @@ export const signPayloadSchema = new Map([
   ],
 ]);
 
-export const signMessage = async (
-  snap: SnapsGlobalObject,
-  origin: string,
-  request: {
-    message: string;
-    recipient: string;
-    nonce: number[];
-    network: NetworkId;
-  },
-) => {
-  const { message, recipient, network, nonce } = request;
+export const signMessage = async (request: {
+  snap: SnapsGlobalObject;
+  origin: string;
+  message: string;
+  recipient: string;
+  nonce: number[];
+  network: NetworkId;
+}) => {
+  const { snap, origin, message, recipient, network, nonce } = request;
   const bufferNonce = Buffer.from(new Uint8Array(nonce));
   if (bufferNonce.byteLength !== 32) {
     throw Error(t('signMessage.nonceNot32bytes'));

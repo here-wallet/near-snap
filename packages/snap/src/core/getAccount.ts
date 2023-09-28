@@ -68,11 +68,12 @@ export async function needActivate(params: {
   });
 }
 
-export async function getAccount(
-  snap: SnapsGlobalObject,
-  network: NearNetwork,
-  origin: string,
-) {
+export async function getAccount(params: {
+  snap: SnapsGlobalObject;
+  network: NearNetwork;
+  origin: string;
+}) {
+  const { network, origin, snap } = params;
   const account = await getSigner(snap, network);
   const permissions = await getPermissions({ network, origin, snap });
   const publicKey = account.publicKey.toString();
