@@ -88,6 +88,7 @@ const signTransaction = async (options: {
   ];
 };
 
+let lastSilentFunctionCall = 0;
 export async function signTransactions(
   params: SignTransactionsParams & { origin: string; snap: SnapsGlobalObject },
 ): Promise<([string, string] | null)[]> {
@@ -105,15 +106,28 @@ export async function signTransactions(
 
       const methods = permissions?.[receiverId];
       if (methods && (methods.length === 0 || methods.includes(methodName))) {
-        const result = await signTransaction({
-          tx: trxs[0],
-          accountId,
-          network,
-          publicKey,
-          signer,
-        });
+        // Limit the number of silent calls (30secs)
+        if (Date.now() - lastSilentFunctionCall > 30 * 1000) {
+          lastSilentFunctionCall = Date.now();
 
-        return [result];
+          const result = await signTransaction({
+            tx: trxs[0],
+            accountId,
+            network,
+            publicKey,
+            signer,
+          });
+
+          await snap.request({
+            method: 'snap_notify',
+            params: {
+              message: t('notify.silentFunctionCall', methodName, receiverId),
+              type: 'native',
+            },
+          });
+
+          return [result];
+        }
       }
     }
   }

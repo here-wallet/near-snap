@@ -6,6 +6,10 @@ export const locales = {
     info: "**Without this, you won't be able to use dApps.** After sending, make sure that your balance has replenished.",
   },
 
+  notify: {
+    silentFunctionCall: 'Call ${STRING} for ${ACCOUNT}',
+  },
+
   signMessage: {
     site: 'Site **${URL}**',
     header: 'Sign Message',

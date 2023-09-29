@@ -7,7 +7,7 @@
     "url": "https://github.com/here-wallet/near-snap.git"
   },
   "source": {
-    "shasum": "K0YNkiW5VFGMbcbVDTSQjtimjvIiLx1m6Fj1b0pf74Q=",
+    "shasum": "aLiX+UvJqBup04REfMi+N6/6LHgE1aBVFux0DEVLAj0=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -20,6 +20,7 @@
   "initialPermissions": {
     "snap_manageState": {},
     "snap_dialog": {},
+    "snap_notify": {},
     "endowment:rpc": {
       "dapps": true,
       "snaps": false
