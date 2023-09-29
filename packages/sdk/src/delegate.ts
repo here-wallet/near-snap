@@ -20,7 +20,7 @@ export class DelegateRequestError extends Error {}
 export class HEREDelegateProvider implements DelegateProvderProtocol {
   endpoint = 'https://api.herewallet.app/api/v1';
 
-  payer = 'HERE Wallet';
+  payer = 'here'; // allow: here, pagoda, banyan, foundation
 
   async activateAccount(accountId: string, publicKey: string, network: string) {
     const response = await fetch(`${this.endpoint}/user/create_near_username`, {

@@ -1,7 +1,6 @@
 import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui';
 import { formatNearAmount } from 'near-api-js/lib/utils/format';
-import { Action } from '@near-wallet-selector/core';
-import { DelegateJson, TransactionJson } from '../interfaces';
+import { ActionJson, DelegateJson, TransactionJson } from '../interfaces';
 import { tokens } from '../data/tokens';
 import { t } from './locales';
 
@@ -23,7 +22,7 @@ export const toReadableNumber = (number = '0', decimals?: number): string => {
   return `${wholeStr}.${fractionStr}`.replace(/\.?0+$/u, '');
 };
 
-export const viewAction = (receiver: string, action: Action) => {
+export const viewAction = (receiver: string, action: ActionJson) => {
   const view = panel([]);
   view.children.push(divider());
 
@@ -94,6 +93,7 @@ export const viewAction = (receiver: string, action: Action) => {
     }
 
     case 'AddKey': {
+      // @ts-expect-error FullAccess is prohibited by the superstruct
       if (action.params.accessKey.permission === 'FullAccess') {
         view.children.push(
           heading(action.type),
@@ -132,9 +132,17 @@ export const viewAction = (receiver: string, action: Action) => {
     }
 
     default:
+      // @ts-expect-error Unknown action type
       view.children.push(heading(action.type), text(JSON.stringify(action)));
       return view;
   }
+};
+
+export const PAYERS = {
+  here: 'Here Wallet',
+  pagoda: 'Pagoda',
+  banyan: 'Banyan',
+  foundation: 'NEAR Foundation',
 };
 
 export const viewDelegate = (data: {
@@ -145,7 +153,8 @@ export const viewDelegate = (data: {
   payer?: string;
   hintBalance?: string;
 }) => {
-  const { hintBalance, accountId, origin, payer, action } = data;
+  const { hintBalance, accountId, origin, payer = '', action } = data;
+  const payerLabel = { ...PAYERS }[payer] || 'another account';
 
   return panel([
     heading(t('viewDelegate.header')),
@@ -159,7 +168,7 @@ export const viewDelegate = (data: {
     copyable(action.receiverId),
     divider(),
     heading(t('viewDelegate.gasFree')),
-    text(t('viewDelegate.gasFreeText', payer ?? 'another account')),
+    text(t('viewDelegate.gasFreeText', payerLabel)),
     ...data.action.actions.map((act) => viewAction(action.receiverId, act)),
   ]);
 };

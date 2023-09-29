@@ -1,13 +1,9 @@
 import { BN } from 'bn.js';
 import { PublicKey } from '@near-js/crypto/lib/public_key';
 import * as transactions from 'near-api-js/lib/transaction';
-import type { Action, AddKeyPermission } from '@near-wallet-selector/core';
+import { ActionJson, AddKeyPermissionJson } from '../interfaces';
 
-const getAccessKey = (permission: AddKeyPermission) => {
-  if (permission === 'FullAccess') {
-    return transactions.fullAccessKey();
-  }
-
+const getAccessKey = (permission: AddKeyPermissionJson) => {
   const { receiverId, methodNames = [] } = permission;
   const allowance = permission.allowance
     ? new BN(permission.allowance)
@@ -16,16 +12,8 @@ const getAccessKey = (permission: AddKeyPermission) => {
   return transactions.functionCallAccessKey(receiverId, methodNames, allowance);
 };
 
-export const createAction = (action: Action): transactions.Action => {
+export const createAction = (action: ActionJson): transactions.Action => {
   switch (action.type) {
-    case 'CreateAccount':
-      return transactions.createAccount();
-
-    case 'DeployContract': {
-      const { code } = action.params;
-      return transactions.deployContract(code);
-    }
-
     case 'FunctionCall': {
       const { methodName, args, gas, deposit } = action.params;
 
@@ -42,11 +30,6 @@ export const createAction = (action: Action): transactions.Action => {
       return transactions.transfer(new BN(deposit));
     }
 
-    case 'Stake': {
-      const { stake, publicKey } = action.params;
-      return transactions.stake(new BN(stake), PublicKey.from(publicKey));
-    }
-
     case 'AddKey': {
       const { publicKey, accessKey } = action.params;
       return transactions.addKey(
@@ -58,11 +41,6 @@ export const createAction = (action: Action): transactions.Action => {
     case 'DeleteKey': {
       const { publicKey } = action.params;
       return transactions.deleteKey(PublicKey.from(publicKey));
-    }
-
-    case 'DeleteAccount': {
-      const { beneficiaryId } = action.params;
-      return transactions.deleteAccount(beneficiaryId);
     }
 
     default:

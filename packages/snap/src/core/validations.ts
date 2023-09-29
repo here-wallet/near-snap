@@ -1,10 +1,5 @@
 import { PublicKey } from '@near-js/crypto';
 import {
-  DeleteKeyAction,
-  FunctionCallAction,
-  TransferAction,
-} from '@near-wallet-selector/core';
-import {
   object,
   array,
   defaulted,
@@ -21,16 +16,7 @@ import {
   union,
   any,
 } from 'superstruct';
-
-import {
-  NearNetwork,
-  SignTransactionsParams,
-  TransactionJson,
-  DelegateJson,
-  SignDelegatedTransactionParams,
-  SignMessageParams,
-  AddLimitedKeyAction,
-} from '../interfaces';
+import { NearNetwork } from '../interfaces';
 
 export const safeThrowable = (exec: () => void) => {
   try {
@@ -77,8 +63,7 @@ export const networkSchema: Describe<NearNetwork> = enums([
   'mainnet',
 ]);
 
-// @ts-expect-error idk why its wrong
-const functionCallAction: Describe<FunctionCallAction> = object({
+export const functionCallAction = object({
   type: literal('FunctionCall'),
   params: object({
     args: any(),
@@ -88,89 +73,86 @@ const functionCallAction: Describe<FunctionCallAction> = object({
   }),
 });
 
-const transferAction: Describe<TransferAction> = object({
+export const transferAction = object({
   type: literal('Transfer'),
   params: object({
     deposit: serializedBigInt(),
   }),
 });
 
-const addLimitedKeyAction: Describe<AddLimitedKeyAction> = object({
+export const addKeyPermissionSchema = object({
+  receiverId: accountId(),
+  allowance: optional(string()),
+  methodNames: optional(array(string())),
+});
+
+export const addLimitedKeyAction = object({
   type: literal('AddKey'),
   params: object({
     publicKey: publicKey(),
     accessKey: object({
-      nonce: optional(number()),
-      permission: object({
-        receiverId: accountId(),
-        allowance: optional(string()),
-        methodNames: optional(array(string())),
-      }),
+      nonce: optional(serializedBigInt()),
+      permission: addKeyPermissionSchema,
     }),
   }),
 });
 
-const deleteKeyAction: Describe<DeleteKeyAction> = object({
+export const deleteKeyAction = object({
   type: literal('DeleteKey'),
   params: object({
     publicKey: publicKey(),
   }),
 });
 
-const action = union([
+export const actionSchema = union([
   functionCallAction,
   transferAction,
   deleteKeyAction,
   addLimitedKeyAction,
 ]);
 
-const transaction: Describe<TransactionJson> = object({
+export const transactionSchema = object({
   recentBlockHash: string(),
   signerId: optional(accountId()),
   receiverId: accountId(),
-  actions: array(action),
-  nonce: number(),
+  actions: array(actionSchema),
+  nonce: serializedBigInt(),
 });
 
-const delegateAction: Describe<DelegateJson> = object({
-  maxBlockHeight: number(),
-  actions: array(action),
+export const delegateActionSchema = object({
+  maxBlockHeight: serializedBigInt(),
+  actions: array(actionSchema),
   publicKey: publicKey(),
   receiverId: accountId(),
   senderId: accountId(),
-  nonce: number(),
+  nonce: serializedBigInt(),
 });
 
-export const signTransactionsSchema: Describe<SignTransactionsParams> = object({
+export const signTransactionsSchema = object({
   network: networkSchema,
   hintBalance: optional(serializedBigInt()),
-  transactions: array(transaction),
+  transactions: array(transactionSchema),
 });
 
-export const signDelegateSchema: Describe<SignDelegatedTransactionParams> =
-  object({
-    delegateAction,
-    network: networkSchema,
-    hintBalance: optional(serializedBigInt()),
-    payer: optional(string()),
-  });
+export const signDelegateSchema = object({
+  network: networkSchema,
+  delegateAction: delegateActionSchema,
+  hintBalance: optional(serializedBigInt()),
+  payer: optional(string()),
+});
 
-export const signMessageSchema: Describe<SignMessageParams> = object({
+export const signMessageSchema = object({
   message: string(),
   recipient: string(),
   nonce: array(number()),
   network: networkSchema,
 });
 
-export const validAccountSchema: Describe<{ network: NearNetwork }> = object({
+export const validAccountSchema = object({
   network: networkSchema,
 });
 
-export const connectWalletSchema: Describe<{
-  methods?: string[];
-  contractId?: string;
-  network: NearNetwork;
-}> = object({
+export const connectWalletSchema = object({
   contractId: optional(accountId()),
   methods: optional(array(string())),
   network: networkSchema,

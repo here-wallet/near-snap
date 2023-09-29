@@ -1,12 +1,12 @@
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui';
-import { NetworkId } from '@near-wallet-selector/core';
+import { NearNetwork } from '../interfaces';
 import { InputAssertError } from './validations';
 import { getSigner } from './getAccount';
 import { t } from './locales';
 
 type PermissionsPath = {
-  network: NetworkId;
+  network: NearNetwork;
   snap: SnapsGlobalObject;
   origin: string;
 };

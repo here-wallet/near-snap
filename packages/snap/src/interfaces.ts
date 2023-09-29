@@ -1,68 +1,26 @@
+import { Infer } from 'superstruct';
 import {
-  DeleteKeyAction,
-  FunctionCallAction,
-  TransferAction,
-} from '@near-wallet-selector/core';
+  addKeyPermissionSchema,
+  actionSchema,
+  delegateActionSchema,
+  signDelegateSchema,
+  signMessageSchema,
+  signTransactionsSchema,
+  transactionSchema,
+} from './core/validations';
 
-export type AddLimitedKeyAction = {
-  type: 'AddKey';
-  params: {
-    publicKey: string;
-    accessKey: {
-      nonce?: number;
-      permission: {
-        receiverId: string;
-        allowance?: string;
-        methodNames?: string[];
-      };
-    };
-  };
-};
+export type AddKeyPermissionJson = Infer<typeof addKeyPermissionSchema>;
 
-export type TransactionJson = {
-  nonce: number;
-  receiverId: string;
-  recentBlockHash: string;
-  actions: (
-    | FunctionCallAction
-    | AddLimitedKeyAction
-    | TransferAction
-    | DeleteKeyAction
-  )[];
-};
+export type ActionJson = Infer<typeof actionSchema>;
 
-export type DelegateJson = {
-  maxBlockHeight: number;
-  publicKey: string;
-  nonce: number;
-  receiverId: string;
-  senderId: string;
-  actions: (
-    | FunctionCallAction
-    | AddLimitedKeyAction
-    | TransferAction
-    | DeleteKeyAction
-  )[];
-};
+export type TransactionJson = Infer<typeof transactionSchema>;
 
-export type SignMessageParams = {
-  network: NearNetwork;
-  message: string;
-  recipient: string;
-  nonce: number[];
-};
+export type DelegateJson = Infer<typeof delegateActionSchema>;
 
-export type SignDelegatedTransactionParams = {
-  network: NearNetwork;
-  hintBalance?: string;
-  delegateAction: DelegateJson;
-  payer?: string;
-};
+export type SignMessageParams = Infer<typeof signMessageSchema>;
 
-export type SignTransactionsParams = {
-  transactions: TransactionJson[];
-  hintBalance?: string;
-  network: NearNetwork;
-};
+export type SignDelegatedTransactionParams = Infer<typeof signDelegateSchema>;
+
+export type SignTransactionsParams = Infer<typeof signTransactionsSchema>;
 
 export type NearNetwork = 'testnet' | 'mainnet';

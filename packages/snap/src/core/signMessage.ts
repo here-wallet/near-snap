@@ -1,7 +1,7 @@
 import { copyable, heading, panel, text } from '@metamask/snaps-ui';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { serialize } from 'near-api-js/lib/utils/serialize';
-import { NetworkId } from '@near-wallet-selector/core';
+import { NearNetwork } from '../interfaces';
 import { InputAssertError } from './validations';
 import { getSigner } from './getAccount';
 import { t } from './locales';
@@ -60,7 +60,7 @@ export const signMessage = async (request: {
   message: string;
   recipient: string;
   nonce: number[];
-  network: NetworkId;
+  network: NearNetwork;
 }) => {
   const { snap, origin, message, recipient, network, nonce } = request;
   const bufferNonce = Buffer.from(new Uint8Array(nonce));
