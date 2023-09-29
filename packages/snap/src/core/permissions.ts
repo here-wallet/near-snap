@@ -61,9 +61,10 @@ export async function connectApp(params: ConnectOptions) {
   const view = panel([text(t('connectApp.site', params.origin))]);
 
   if (params.contractId) {
-    const allowMethodsText = params.methods
-      ? t('connectApp.allowMethods', params.contractId)
-      : t('connectApp.allowAllMethods', params.contractId);
+    const isAllMethods = params.methods ? params.methods.length === 0 : true;
+    const allowMethodsText = isAllMethods
+      ? t('connectApp.allowAllMethods', params.contractId)
+      : t('connectApp.allowMethods', params.contractId);
 
     view.children.push(
       heading(t('connectApp.header')),
