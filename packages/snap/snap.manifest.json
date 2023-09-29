@@ -1,5 +1,5 @@
 {
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Sign transaction for NEAR Protocol. Created by BANYAN and HERE Wallet",
   "proposedName": "NEAR Protocol Snap",
   "repository": {
@@ -27,21 +27,11 @@
     },
     "snap_getBip32Entropy": [
       {
-        "path": [
-          "m",
-          "44'",
-          "397'",
-          "0'"
-        ],
+        "path": ["m", "44'", "397'", "0'"],
         "curve": "ed25519"
       },
       {
-        "path": [
-          "m",
-          "44'",
-          "1'",
-          "0'"
-        ],
+        "path": ["m", "44'", "1'", "0'"],
         "curve": "ed25519"
       }
     ]
