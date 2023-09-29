@@ -106,11 +106,9 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         throw new InputAssertError('Method not found');
     }
   } catch (e) {
-    console.error(e);
-
     // Pass only validations errors, to ensure that no important data is accidentally exposed
     if (e instanceof InputAssertError) {
-      return new Error(`Validation error: ${e.message}`);
+      throw new Error(`Validation error: ${e.message}`);
     }
 
     throw Error('Internal error');

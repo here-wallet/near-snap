@@ -1,7 +1,11 @@
 import { PublicKey } from '@near-js/crypto';
 import {
+  DeleteKeyAction,
+  FunctionCallAction,
+  TransferAction,
+} from '@near-wallet-selector/core';
+import {
   object,
-  any,
   array,
   defaulted,
   Describe,
@@ -13,6 +17,9 @@ import {
   assert,
   Struct,
   StructError,
+  literal,
+  union,
+  any,
 } from 'superstruct';
 
 import {
@@ -22,6 +29,7 @@ import {
   DelegateJson,
   SignDelegatedTransactionParams,
   SignMessageParams,
+  AddLimitedKeyAction,
 } from '../interfaces';
 
 export const safeThrowable = (exec: () => void) => {
@@ -69,17 +77,64 @@ export const networkSchema: Describe<NearNetwork> = enums([
   'mainnet',
 ]);
 
+// @ts-expect-error idk why its wrong
+const functionCallAction: Describe<FunctionCallAction> = object({
+  type: literal('FunctionCall'),
+  params: object({
+    args: any(),
+    deposit: serializedBigInt(),
+    gas: serializedBigInt(),
+    methodName: string(),
+  }),
+});
+
+const transferAction: Describe<TransferAction> = object({
+  type: literal('Transfer'),
+  params: object({
+    deposit: serializedBigInt(),
+  }),
+});
+
+const addLimitedKeyAction: Describe<AddLimitedKeyAction> = object({
+  type: literal('AddKey'),
+  params: object({
+    publicKey: publicKey(),
+    accessKey: object({
+      nonce: optional(number()),
+      permission: object({
+        receiverId: accountId(),
+        allowance: optional(string()),
+        methodNames: optional(array(string())),
+      }),
+    }),
+  }),
+});
+
+const deleteKeyAction: Describe<DeleteKeyAction> = object({
+  type: literal('DeleteKey'),
+  params: object({
+    publicKey: publicKey(),
+  }),
+});
+
+const action = union([
+  functionCallAction,
+  transferAction,
+  deleteKeyAction,
+  addLimitedKeyAction,
+]);
+
 const transaction: Describe<TransactionJson> = object({
   recentBlockHash: string(),
   signerId: optional(accountId()),
   receiverId: accountId(),
-  actions: array(any()),
+  actions: array(action),
   nonce: number(),
 });
 
 const delegateAction: Describe<DelegateJson> = object({
   maxBlockHeight: number(),
-  actions: array(any()),
+  actions: array(action),
   publicKey: publicKey(),
   receiverId: accountId(),
   senderId: accountId(),

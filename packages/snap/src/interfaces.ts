@@ -1,27 +1,48 @@
 import {
-  Action,
-  DeleteAccountAction,
   DeleteKeyAction,
-  DeployContractAction,
   FunctionCallAction,
-  StakeAction,
   TransferAction,
 } from '@near-wallet-selector/core';
 
+export type AddLimitedKeyAction = {
+  type: 'AddKey';
+  params: {
+    publicKey: string;
+    accessKey: {
+      nonce?: number;
+      permission: {
+        receiverId: string;
+        allowance?: string;
+        methodNames?: string[];
+      };
+    };
+  };
+};
+
 export type TransactionJson = {
-  receiverId: string;
-  actions: Action[];
   nonce: number;
+  receiverId: string;
   recentBlockHash: string;
+  actions: (
+    | FunctionCallAction
+    | AddLimitedKeyAction
+    | TransferAction
+    | DeleteKeyAction
+  )[];
 };
 
 export type DelegateJson = {
   maxBlockHeight: number;
-  actions: Action[];
   publicKey: string;
   nonce: number;
   receiverId: string;
   senderId: string;
+  actions: (
+    | FunctionCallAction
+    | AddLimitedKeyAction
+    | TransferAction
+    | DeleteKeyAction
+  )[];
 };
 
 export type SignMessageParams = {
@@ -45,11 +66,3 @@ export type SignTransactionsParams = {
 };
 
 export type NearNetwork = 'testnet' | 'mainnet';
-
-export type ActionWithParams =
-  | DeployContractAction
-  | FunctionCallAction
-  | TransferAction
-  | StakeAction
-  | DeleteKeyAction
-  | DeleteAccountAction;
