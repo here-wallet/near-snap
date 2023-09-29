@@ -7,13 +7,7 @@ import { t } from './locales';
 
 export const TGAS = Math.pow(10, 12);
 
-const formatAmount = (amount: string) => {
-  const near = formatNearAmount(amount);
-  if (Number(near) < 0.000001) {
-    return `${amount} YoctoNear`;
-  }
-  return `${near} NEAR`;
-};
+const isYocto = (v: string | number) => Number(v) < 0.00000000001;
 
 export const toReadableNumber = (number = '0', decimals?: number): string => {
   if (!decimals) {
@@ -44,35 +38,49 @@ export const viewAction = (receiver: string, action: Action) => {
         const { amount } = action.params.args as any;
         const readableAmount = toReadableNumber(amount, Number(ft.decimal));
 
+        const deposit = formatNearAmount(action.params.deposit);
+        const isYoctoDeposit = isYocto(deposit) ? 'yoctoDeposit' : 'deposit';
+        const near = isYocto(deposit) ? action.params.deposit : deposit;
+
         view.children.push(
           heading(t('FunctionCall.ftTransfer', ft.ticker)),
           text(t('FunctionCall.ftAmount', readableAmount, ft.ticker)),
           text(t('FunctionCall.method', action.params.methodName)),
-          text(t('FunctionCall.deposit', formatAmount(action.params.deposit))),
+          text(t(`FunctionCall.${isYoctoDeposit}`, near)),
           text(t('FunctionCall.gas', gas)),
           text(t('FunctionCall.args')),
           argsCopy,
         );
+
         return view;
       }
+
+      const deposit = formatNearAmount(action.params.deposit);
+      const isYoctoDeposit = isYocto(deposit) ? 'yoctoDeposit' : 'deposit';
+      const near = isYocto(deposit) ? action.params.deposit : deposit;
 
       view.children.push(
         heading(action.type),
         text(t('FunctionCall.method', action.params.methodName)),
-        text(t('FunctionCall.deposit', formatAmount(action.params.deposit))),
+        text(t(`FunctionCall.${isYoctoDeposit}`, near)),
         text(t('FunctionCall.gas', gas)),
         text(t('FunctionCall.args')),
         argsCopy,
       );
+
       return view;
     }
 
     case 'Transfer': {
-      const deposit = formatAmount(action.params.deposit);
+      const deposit = formatNearAmount(action.params.deposit);
+      const isYoctoDeposit = isYocto(deposit) ? 'yoctoDeposit' : 'deposit';
+      const near = isYocto(deposit) ? action.params.deposit : deposit;
+
       view.children.push(
         heading(action.type),
-        text(t('Transfer.deposit'), deposit),
+        text(t(`Transfer.${isYoctoDeposit}`, near)),
       );
+
       return view;
     }
 
@@ -107,7 +115,7 @@ export const viewAction = (receiver: string, action: Action) => {
       );
 
       if (allowance !== undefined) {
-        const value = formatAmount(allowance);
+        const value = formatNearAmount(allowance);
         view.children.push(text(t('AddKey.allowance', value)));
       }
 
@@ -143,7 +151,7 @@ export const viewDelegate = (data: {
     heading(t('viewDelegate.header')),
     text(t('viewDelegate.site', origin)),
     hintBalance
-      ? text(t('viewDelegate.balance', formatAmount(hintBalance)))
+      ? text(t('viewDelegate.balance', formatNearAmount(hintBalance, 4)))
       : text(''),
     text(t('viewDelegate.yourAccount', data.network)),
     copyable(accountId),
@@ -170,7 +178,7 @@ export const viewTransactions = (
       heading(header),
       text(t('viewTransactions.site', origin)),
       hintBalance
-        ? text(t('viewTransactions.balance', formatAmount(hintBalance)))
+        ? text(t('viewTransactions.balance', formatNearAmount(hintBalance, 4)))
         : text(''),
       text(t('viewTransactions.yourAccount', network)),
       copyable(accountId),

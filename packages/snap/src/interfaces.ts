@@ -16,10 +16,10 @@ export type TransactionJson = {
 };
 
 export type DelegateJson = {
-  maxBlockHeight: string;
+  maxBlockHeight: number;
   actions: Action[];
   publicKey: string;
-  nonce: string;
+  nonce: number;
   receiverId: string;
   senderId: string;
 };

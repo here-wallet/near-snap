@@ -2,6 +2,7 @@ import { copyable, heading, panel, text } from '@metamask/snaps-ui';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { serialize } from 'near-api-js/lib/utils/serialize';
 import { NetworkId } from '@near-wallet-selector/core';
+import { InputAssertError } from './validations';
 import { getSigner } from './getAccount';
 import { t } from './locales';
 
@@ -64,7 +65,7 @@ export const signMessage = async (request: {
   const { snap, origin, message, recipient, network, nonce } = request;
   const bufferNonce = Buffer.from(new Uint8Array(nonce));
   if (bufferNonce.byteLength !== 32) {
-    throw Error(t('signMessage.nonceNot32bytes'));
+    throw new InputAssertError(t('signMessage.nonceNot32bytes'));
   }
 
   const { signer, accountId } = await getSigner(snap, network);
@@ -89,7 +90,7 @@ export const signMessage = async (request: {
   });
 
   if (!confirmation) {
-    throw Error(t('signMessage.accessDenied'));
+    throw new InputAssertError(t('signMessage.accessDenied'));
   }
   // Create the payload and sign it
   const payload = new SignPayload({

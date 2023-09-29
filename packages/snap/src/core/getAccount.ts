@@ -9,6 +9,7 @@ import bs58 from 'bs58';
 
 import { NearNetwork } from '../interfaces';
 import { getPermissions } from './permissions';
+import { InputAssertError } from './validations';
 import { t } from './locales';
 
 const nearNetwork = {
@@ -29,7 +30,7 @@ export async function getKeyPair(
   })) as JsonBIP44Node;
 
   if (node.privateKey === undefined) {
-    throw Error(t('getKeyPair.privateNotDefined'));
+    throw new InputAssertError(t('getKeyPair.privateNotDefined'));
   }
 
   const buf = Buffer.from(node.privateKey.substring(2), 'hex');
@@ -79,7 +80,7 @@ export async function getAccount(params: {
   const publicKey = account.publicKey.toString();
 
   if (!permissions) {
-    throw Error(t('getAccount.accessDenied'));
+    throw new InputAssertError(t('getAccount.accessDenied'));
   }
 
   return { publicKey, accountId: account.accountId, permissions };

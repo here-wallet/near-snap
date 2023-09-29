@@ -10,7 +10,7 @@
     "jsx": "preserve",
     "sourceMap": true,
     "strict": true,
-    "target": "es6",
+    "target": "ES2021"
   },
   "exclude": ["**/__snapshots__/**", "**/test/**", "**/*.test.ts"]
 }

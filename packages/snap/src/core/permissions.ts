@@ -1,6 +1,7 @@
 import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui';
 import { NetworkId } from '@near-wallet-selector/core';
+import { InputAssertError } from './validations';
 import { getSigner } from './getAccount';
 import { t } from './locales';
 
@@ -86,7 +87,7 @@ export async function connectApp(params: ConnectOptions) {
   });
 
   if (!isConfirmed) {
-    throw Error(t('connectApp.accessDenied'));
+    throw new InputAssertError(t('connectApp.accessDenied'));
   }
 
   let data: any = await snap.request({

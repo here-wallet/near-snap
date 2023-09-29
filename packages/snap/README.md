@@ -24,20 +24,24 @@ await window.ethereum.request({
 
 ```js
 // Like wallet-selector format transactions
-const transactions = [{
-  nonce: 1000,
-  recentBlockHash: 'block_hash',
-  receiverId: 'herewallet.near',
-  actions: [{
-    type: 'FunctionCall',
-    params: {
-      methodName: 'method',
-      args: { arg1: '123' },
-      gas: 500000000,
-      deposit: '3000000',
-    },
-  }]
-}]
+const transactions = [
+  {
+    nonce: 1000,
+    recentBlockHash: 'block_hash',
+    receiverId: 'herewallet.near',
+    actions: [
+      {
+        type: 'FunctionCall',
+        params: {
+          methodName: 'method',
+          args: { arg1: '123' },
+          gas: 500000000,
+          deposit: '3000000',
+        },
+      },
+    ],
+  },
+];
 
 await window.ethereum.request({
   method: 'wallet_invokeSnap',
@@ -45,15 +49,14 @@ await window.ethereum.request({
     snapId: defaultSnapOrigin,
     request: {
       method: 'near_signTransactions',
-      params: { network: 'mainnet', transactions }
-    }
-  }
-})
-
-// Result, null if transaction was dined
-[["txHash", "signedTrx_hex"], null, ["txHash", "signedTrx_hex"]]
+      params: { network: 'mainnet', transactions },
+    },
+  },
+})[
+  // Result, null if transaction was dined
+  (['txHash', 'signedTrx_hex'], null, ['txHash', 'signedTrx_hex'])
+];
 ```
-
 
 ### Sign delegate
 
@@ -64,8 +67,8 @@ await window.ethereum.request({
     snapId: defaultSnapOrigin,
     request: {
       method: 'near_signDelegate',
-      params: { 
-        network: 'mainnet', 
+      params: {
+        network: 'mainnet',
         payer: 'HERE Wallet', // optional
         delegateAction: {
           maxBlockHeight: string;
@@ -74,7 +77,7 @@ await window.ethereum.request({
           nonce: string;
           receiverId: string;
           senderId: string;
-        } 
+        }
       }
     }
   }

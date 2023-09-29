@@ -13,6 +13,7 @@ import {
 import { createAction } from './createAction';
 import { viewDelegate, viewTransactions } from './viewTransactions';
 import { getPermissions } from './permissions';
+import { InputAssertError } from './validations';
 import { getSigner } from './getAccount';
 import { t } from './locales';
 
@@ -35,7 +36,7 @@ export async function signDelegatedTransaction(
   });
 
   if (!confirmation) {
-    throw Error(t('viewDelegate.accessDenied'));
+    throw new InputAssertError(t('viewDelegate.accessDenied'));
   }
 
   const senderId = action.senderId ?? accountId;
