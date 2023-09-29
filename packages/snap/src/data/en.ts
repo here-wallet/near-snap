@@ -28,10 +28,9 @@ export const locales = {
     site: 'Site **${URL}**',
     accessDenied: 'Access is denied',
     header: 'Asks for permission to connect:',
-    allowMethods:
-      '_You authorize the contract_ **${ACCOUNT}** _to call the following_ **not payable** _methods:_',
-    allowAllMethods:
-      '_You authorize the contract_ **${ACCOUNT}** _to call_ **all not payable methods**',
+    authorizeContract: 'You authorize the contract:',
+    allowMethods: 'To call the following **not payable** methods:',
+    allowAllMethods: 'To call **all not payable methods!**',
     askingPublicData: 'Asking for your public data:',
     yourTypeAddress: 'Your **${ACCOUNT}** address:',
     yourPublicKey: 'Your public key:',

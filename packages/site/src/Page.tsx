@@ -26,9 +26,12 @@ const Index = () => {
   const [isPayable, setPayable] = useState(false);
   const [value, setValue] = useState('');
 
-  const swithTo = account?.network === 'mainnet' ? 'testnet' : 'mainnet';
+  const network = account ? account.network : 'mainnet';
+  const swithTo = network === 'testnet' ? 'mainnet' : 'testnet';
+  const switchContract =
+    swithTo === 'mainnet' ? 'guest-book.near' : 'guest-book.testnet';
   const contractId =
-    account?.network === 'mainnet' ? 'guest-book.near' : 'guest-book.testnet';
+    network === 'mainnet' ? 'guest-book.near' : 'guest-book.testnet';
 
   useEffect(() => {
     if (!account) {
@@ -176,14 +179,18 @@ const Index = () => {
                   <Button
                     style={{ flex: 1 }}
                     disabled={status !== NearSnapStatus.INSTALLED}
-                    onClick={() => connectWallet('mainnet')}
+                    onClick={() =>
+                      connectWallet('mainnet', contractId, ['addMessage'])
+                    }
                   >
                     Mainnet
                   </Button>
                   <Button
                     style={{ flex: 1 }}
                     disabled={status !== NearSnapStatus.INSTALLED}
-                    onClick={() => connectWallet('testnet')}
+                    onClick={() =>
+                      connectWallet('testnet', contractId, ['addMessage'])
+                    }
                   >
                     Testnet
                   </Button>
@@ -207,7 +214,11 @@ const Index = () => {
                 title: 'Switch network',
                 description: 'Near Snap support mainnet and testnet, try both!',
                 button: (
-                  <Button onClick={() => connectWallet(swithTo)}>
+                  <Button
+                    onClick={() =>
+                      connectWallet(swithTo, switchContract, ['addMessage'])
+                    }
+                  >
                     To {swithTo}
                   </Button>
                 ),

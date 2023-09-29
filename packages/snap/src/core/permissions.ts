@@ -61,15 +61,18 @@ export async function connectApp(params: ConnectOptions) {
   const view = panel([text(t('connectApp.site', params.origin))]);
 
   if (params.contractId) {
-    const isAllMethods = params.methods ? params.methods.length === 0 : true;
-    const allowMethodsText = isAllMethods
-      ? t('connectApp.allowAllMethods', params.contractId)
-      : t('connectApp.allowMethods', params.contractId);
+    const methods = params.methods ?? [];
+    const allowMethodsText =
+      methods.length === 0
+        ? t('connectApp.allowAllMethods')
+        : t('connectApp.allowMethods');
 
     view.children.push(
       heading(t('connectApp.header')),
+      text(t('connectApp.authorizeContract')),
+      copyable(params.contractId),
       text(allowMethodsText),
-      text(params.methods?.join(', ') ?? ''),
+      methods.length > 0 ? copyable(methods.join(', ')) : text(''),
       divider(),
     );
   }

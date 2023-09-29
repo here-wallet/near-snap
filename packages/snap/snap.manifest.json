@@ -7,7 +7,7 @@
     "url": "https://github.com/here-wallet/near-snap.git"
   },
   "source": {
-    "shasum": "mlergV5jvRcEDwoVvI8FEyPh03bHxeA4P9bqvhT5vj0=",
+    "shasum": "K0YNkiW5VFGMbcbVDTSQjtimjvIiLx1m6Fj1b0pf74Q=",
     "location": {
       "npm": {
         "filePath": "dist/bundle.js",
@@ -26,11 +26,21 @@
     },
     "snap_getBip32Entropy": [
       {
-        "path": ["m", "44'", "397'", "0'"],
+        "path": [
+          "m",
+          "44'",
+          "397'",
+          "0'"
+        ],
         "curve": "ed25519"
       },
       {
-        "path": ["m", "44'", "1'", "0'"],
+        "path": [
+          "m",
+          "44'",
+          "1'",
+          "0'"
+        ],
         "curve": "ed25519"
       }
     ]
