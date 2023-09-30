@@ -33,6 +33,8 @@ export class HEREDelegateProvider implements DelegateProvderProtocol {
       }),
       headers: {
         Network: network,
+        'Content-Type': 'application/json',
+        authorization: 'metamask',
       },
     });
 
@@ -51,8 +53,12 @@ export class HEREDelegateProvider implements DelegateProvderProtocol {
     ).toString('base64');
 
     const response = await fetch(`${this.endpoint}/transactions/is_delegate`, {
-      body: JSON.stringify({ transaction: trxBase64 }),
       method: 'POST',
+      body: JSON.stringify({ transaction: trxBase64 }),
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: 'metamask',
+      },
     });
 
     if (!response.ok) {
@@ -80,6 +86,10 @@ export class HEREDelegateProvider implements DelegateProvderProtocol {
           signature: base_encode(action.signature.data),
           transaction: trxBase64,
         }),
+        headers: {
+          'Content-Type': 'application/json',
+          authorization: 'metamask',
+        },
       },
     );
 
