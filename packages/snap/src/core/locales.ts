@@ -2,11 +2,29 @@ import { number, string } from 'superstruct';
 import { locales } from '../data/en';
 import { InputAssertError, accountId, inputAssert, url } from './validations';
 
-export const asserts: Record<string, (v: string) => void> = {
-  URL: (value: string) => inputAssert(value, url()),
-  ACCOUNT: (value: string) => inputAssert(value, accountId()),
-  NUMBER: (value: string) => inputAssert(Number(value), number()),
-  STRING: (value: string) => inputAssert(value, string()),
+export const formats: Record<string, (v: string) => string> = {
+  URL: (value: string) => {
+    inputAssert(value, url());
+    return value;
+  },
+
+  ACCOUNT: (value: string) => {
+    inputAssert(value, accountId());
+    return value;
+  },
+
+  NUMBER: (value: string) => {
+    inputAssert(Number(value), number());
+    return Number(value).toString();
+  },
+
+  STRING: (value: string) => {
+    inputAssert(value, string());
+    return value
+      .replace(/[\r\n]/gmu, '')
+      .replace(/\s+/gu, ' ')
+      .trim();
+  },
 };
 
 export const t = (key: string, ...args: any[]) => {
@@ -24,15 +42,14 @@ export const t = (key: string, ...args: any[]) => {
   return txt.replaceAll(
     /\$\{([a-zA-Z]+)\}/gu,
     (_: any, validateName: string) => {
-      if (!(typeof asserts[validateName] === 'function')) {
+      if (typeof formats[validateName] !== 'function') {
         throw new InputAssertError(
-          `Unknown i18n text validator: ${validateName}`,
+          `Unknown i18n text formatter: ${validateName}`,
         );
       }
 
       index += 1;
-      asserts[validateName](args[index]);
-      return args[index];
+      return formats[validateName](args[index]);
     },
   );
 };
