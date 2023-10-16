@@ -2,7 +2,7 @@
 
 **View and sign transactions for NEAR Protocol blockchain.**
 
-- **Audited by OtterSec**
+- **Audited by [OtterSec](https://github.com/here-wallet/near-snap/blob/main/ottersec.pdf)**
 - you can create an account on NEAR Protocol with ed25519 key
 - you can sign transactions on NEAR Protocol
 - FT token transfers and token additions are visualized
