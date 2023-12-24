@@ -1,16 +1,24 @@
 import { OnRpcRequestHandler } from '@metamask/snaps-types';
-import { connectApp, disconnectApp, getPermissions } from './core/permissions';
 import { getAccount, needActivate } from './core/getAccount';
 import { signMessage } from './core/signMessage';
 import {
-  InputAssertError,
-  connectWalletSchema,
+  bindNickname,
+  connectApp,
+  disconnectApp,
+  getPermissions,
+} from './core/permissions';
+
+import {
   inputAssert,
+  InputAssertError,
+  bindNicknameSchema,
+  connectWalletSchema,
   signDelegateSchema,
   signMessageSchema,
   signTransactionsSchema,
   validAccountSchema,
 } from './core/validations';
+
 import {
   signDelegatedTransaction,
   signTransactions,
@@ -25,6 +33,7 @@ enum Methods {
   SignTransaction = 'near_signTransactions',
   SignDelegate = 'near_signDelegate',
   SignMessage = 'near_signMessage',
+  BindNickname = 'near_bindNickname',
 }
 
 export const onRpcRequest: OnRpcRequestHandler = async ({
@@ -62,6 +71,12 @@ export const onRpcRequest: OnRpcRequestHandler = async ({
         const { network } = request.params;
         await disconnectApp({ snap, origin, network });
         return true;
+      }
+
+      case Methods.BindNickname: {
+        inputAssert(request.params, bindNicknameSchema);
+        const { network, nickname } = request.params;
+        return await bindNickname({ network, origin, nickname, snap });
       }
 
       case Methods.SignMessage: {

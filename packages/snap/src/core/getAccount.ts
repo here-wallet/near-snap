@@ -2,7 +2,7 @@ import { copyable, heading, panel, text } from '@metamask/snaps-ui';
 import { JsonBIP44Node } from '@metamask/key-tree';
 import { KeyPair } from '@near-js/crypto/lib/key_pair';
 import { SnapsGlobalObject } from '@metamask/snaps-types';
-import { InMemoryKeyStore } from 'near-api-js/lib/key_stores';
+import { InMemoryKeyStore } from 'near-api-js/lib/key_stores/in_memory_key_store';
 import { InMemorySigner } from 'near-api-js/lib/signer';
 import nacl from 'tweetnacl';
 import bs58 from 'bs58';
@@ -16,6 +16,8 @@ const nearNetwork = {
   mainnet: 397,
   testnet: 1,
 };
+
+export const NICKNAME_KEY = '@nickname';
 
 export async function getKeyPair(
   snap: SnapsGlobalObject,
@@ -42,11 +44,19 @@ export async function getKeyPair(
 
 export async function getSigner(snap: SnapsGlobalObject, network: NearNetwork) {
   const keyPair = await getKeyPair(snap, network);
-  const accountId = Buffer.from(keyPair.getPublicKey().data).toString('hex');
+  const address = Buffer.from(keyPair.getPublicKey().data).toString('hex');
+
+  let state: any = await snap.request({
+    method: 'snap_manageState',
+    params: { operation: 'get' },
+  });
+
+  const accountId = state?.[network]?.[NICKNAME_KEY] || address;
 
   const keystore = new InMemoryKeyStore();
   await keystore.setKey(network, accountId, keyPair);
   const signer = new InMemorySigner(keystore);
+
   return { signer, publicKey: keyPair.getPublicKey(), accountId };
 }
 

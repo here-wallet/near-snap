@@ -2,7 +2,7 @@ import { SnapsGlobalObject } from '@metamask/snaps-types';
 import { copyable, divider, heading, panel, text } from '@metamask/snaps-ui';
 import { NearNetwork } from '../interfaces';
 import { InputAssertError } from './validations';
-import { getSigner } from './getAccount';
+import { NICKNAME_KEY, getSigner } from './getAccount';
 import { t } from './locales';
 
 type PermissionsPath = {
@@ -16,6 +16,8 @@ type ConnectOptions = {
   contractId?: string;
 } & PermissionsPath;
 
+type BindNicknameOptions = { nickname: string } & PermissionsPath;
+
 export async function getPermissions(
   data: PermissionsPath,
 ): Promise<Record<string, string[]> | null> {
@@ -26,6 +28,51 @@ export async function getPermissions(
 
   const origin = state?.[data.network]?.[data.origin];
   return origin ?? null;
+}
+
+export async function bindNickname(params: BindNicknameOptions) {
+  const WHITELIST = [
+    'https://my.herewallet.app',
+    'https://beta.herewallet.app',
+  ];
+
+  if (WHITELIST.includes(params.origin) === false) {
+    throw new InputAssertError(t('connectApp.accessDenied'));
+  }
+
+  let state: any = await snap.request({
+    method: 'snap_manageState',
+    params: { operation: 'get' },
+  });
+
+  if (!state) state = {};
+  if (!state[params.network]) state[params.network] = {};
+  if (state[params.network][NICKNAME_KEY] != null) {
+    throw new InputAssertError(t('connectApp.accessDenied'));
+  }
+
+  const view = panel([text(t('bindNickname.site', params.origin))]);
+  view.children.push(
+    heading(t('bindNickname.title')),
+    text(t('bindNickname.text', params.network)),
+    text(t('bindNickname.newAddress')),
+    copyable(params.nickname),
+  );
+
+  const isConfirmed = await snap.request({
+    method: 'snap_dialog',
+    params: { type: 'confirmation', content: view },
+  });
+
+  if (!isConfirmed) {
+    throw new InputAssertError(t('connectApp.accessDenied'));
+  }
+
+  state[params.network][NICKNAME_KEY] = params.nickname;
+  await snap.request({
+    method: 'snap_manageState',
+    params: { operation: 'update', newState: state },
+  });
 }
 
 export async function disconnectApp(params: PermissionsPath) {

@@ -93,7 +93,6 @@ export const viewAction = (receiver: string, action: ActionJson) => {
     }
 
     case 'AddKey': {
-      // @ts-expect-error FullAccess is prohibited by the superstruct
       if (action.params.accessKey.permission === 'FullAccess') {
         view.children.push(
           heading(action.type),

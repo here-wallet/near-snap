@@ -10,6 +10,13 @@ export const locales = {
     silentFunctionCall: 'Call ${STRING} for ${ACCOUNT}',
   },
 
+  bindNickname: {
+    site: 'Site **${URL}**',
+    title: 'Add a nickname to your account',
+    text: 'HERE has created a nickname for your account for free. Link it so that metamask uses the nickname as an address. **Important! Do not use your hex address if you are attaching a nickname. Any assets must be sent to your nickname address. Do not confirm this action if you did not come up with this nickname.**',
+    newAddress: 'Your nickname:',
+  },
+
   signMessage: {
     site: 'Site **${URL}**',
     header: 'Sign Message',

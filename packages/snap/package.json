@@ -1,6 +1,6 @@
 {
   "name": "@near-snap/plugin",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "description": "View and sign transactions for NEAR Protocol",
   "repository": {
     "type": "git",
@@ -47,7 +47,7 @@
     "@metamask/eslint-config-jest": "^10.0.0",
     "@metamask/eslint-config-nodejs": "^10.0.0",
     "@metamask/eslint-config-typescript": "^10.0.0",
-    "@metamask/snaps-cli": "^0.32.2",
+    "@metamask/snaps-cli": "^4.0.0",
     "@metamask/snaps-jest": "^0.35.2-flask.1",
     "@types/lodash.merge": "^4.6.7",
     "@typescript-eslint/eslint-plugin": "^5.33.0",

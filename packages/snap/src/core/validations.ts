@@ -1,4 +1,3 @@
-import { PublicKey } from '@near-js/crypto';
 import {
   object,
   array,
@@ -16,16 +15,8 @@ import {
   union,
   any,
 } from 'superstruct';
+import { PublicKey } from 'near-api-js/lib/utils/key_pair';
 import { NearNetwork } from '../interfaces';
-
-export const safeThrowable = (exec: () => void) => {
-  try {
-    exec();
-    return true;
-  } catch {
-    return false;
-  }
-};
 
 const ACCOUNT_ID_REGEX =
   /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/u;
@@ -41,17 +32,34 @@ export const accountId = () =>
   );
 
 export const url = () =>
-  define<string>('url', (value: any) => safeThrowable(() => new URL(value)));
+  define<string>('url', (value: any) => {
+    try {
+      new URL(value);
+      return true;
+    } catch {
+      return false;
+    }
+  });
 
 export const publicKey = () =>
-  define<string>('publicKey', (value: any) =>
-    safeThrowable(() => PublicKey.fromString(value)),
-  );
+  define<string>('publicKey', (value: any) => {
+    try {
+      PublicKey.fromString(value);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  });
 
 export const serializedBigInt = () =>
-  define<string>('serializedBigInt', (value: any) =>
-    safeThrowable(() => BigInt(value)),
-  );
+  define<string>('serializedBigInt', (value: any) => {
+    try {
+      BigInt(value);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  });
 
 export const networkSchemaDefaulted: Describe<NearNetwork> = defaulted(
   enums(['testnet', 'mainnet']),
@@ -80,20 +88,24 @@ export const transferAction = object({
   }),
 });
 
-export const addKeyPermissionSchema = object({
-  receiverId: accountId(),
-  allowance: optional(string()),
-  methodNames: optional(array(string())),
-});
+export const addKeyPermissionSchema = union([
+  object({
+    permission: object({
+      receiverId: accountId(),
+      allowance: optional(string()),
+      methodNames: optional(array(string())),
+    }),
+  }),
+  object({
+    permission: literal('FullAccess'),
+  }),
+]);
 
-export const addLimitedKeyAction = object({
+export const addKeyAction = object({
   type: literal('AddKey'),
   params: object({
     publicKey: publicKey(),
-    accessKey: object({
-      nonce: optional(serializedBigInt()),
-      permission: addKeyPermissionSchema,
-    }),
+    accessKey: addKeyPermissionSchema,
   }),
 });
 
@@ -108,7 +120,7 @@ export const actionSchema = union([
   functionCallAction,
   transferAction,
   deleteKeyAction,
-  addLimitedKeyAction,
+  addKeyAction,
 ]);
 
 export const transactionSchema = object({
@@ -145,6 +157,11 @@ export const signMessageSchema = object({
   message: string(),
   recipient: string(),
   nonce: array(number()),
+  network: networkSchema,
+});
+
+export const bindNicknameSchema = object({
+  nickname: string(),
   network: networkSchema,
 });
 

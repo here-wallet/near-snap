@@ -3,7 +3,11 @@ import { PublicKey } from '@near-js/crypto/lib/public_key';
 import * as transactions from 'near-api-js/lib/transaction';
 import { ActionJson, AddKeyPermissionJson } from '../interfaces';
 
-const getAccessKey = (permission: AddKeyPermissionJson) => {
+const getAccessKey = ({
+  permission,
+}: AddKeyPermissionJson): transactions.AccessKey => {
+  if (permission === 'FullAccess') return transactions.fullAccessKey();
+
   const { receiverId, methodNames = [] } = permission;
   const allowance = permission.allowance
     ? new BN(permission.allowance)
@@ -34,7 +38,7 @@ export const createAction = (action: ActionJson): transactions.Action => {
       const { publicKey, accessKey } = action.params;
       return transactions.addKey(
         PublicKey.from(publicKey),
-        getAccessKey(accessKey.permission),
+        getAccessKey(accessKey),
       );
     }
 
